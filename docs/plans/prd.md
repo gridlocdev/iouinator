@@ -43,6 +43,7 @@ IOUinator keeps track of who owes whom among a group of people. You list the peo
 ### §4.3 Adding and editing
 
 - The transaction form sits above the list: From, To, Amount, For, and **Add**. Enter in any field adds. After adding, From and To stay, Amount and For are cleared, and focus goes to Amount. An error shows under the form and nothing is added.
+- From and To are pickers with the page's own list of the ledger's people, not native selects (a native select's open list on macOS takes no keys from the page). Space, ↓ or ↑ opens the list, with the current person highlighted and checked. While it is open, Tab and ↓ move down and Shift+Tab and ↑ move up, stopping at the ends; Home and End go to the first and last; a letter jumps to the next name starting with it; Enter or Space picks; Esc closes without picking, and inside a dialog doesn't close the dialog. Focus stays on the picker. While it is closed, Tab and Shift+Tab move between fields as usual, Enter adds the transaction, and a letter picks the next name starting with it. Picking the person shown in the other picker swaps the two.
 - With fewer than two people the form is replaced by the line "Add at least two people to record a transaction."
 - **New Transaction** (N outside a text field) puts focus in the form's Amount field.
 - Choosing a transaction in the list and pressing Enter, or double-clicking it, opens **Edit Transaction**, with the same fields and Save / Cancel. Saving with no field changed changes nothing (no undo step, no save).

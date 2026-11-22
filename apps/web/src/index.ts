@@ -12,6 +12,7 @@ export { MAX_UNDO, UndoStack } from './app/undo.ts';
 export { menuSender, nativeMenu } from './app/nativeMenu.ts';
 export { shortcutGroups, type ShortcutGroup, type ShortcutLine } from './app/shortcuts.ts';
 export { balanceText } from './app/PeoplePane.tsx';
+export { nextByLetter } from './app/PersonPicker.tsx';
 export { edgeKey } from './app/mermaidDraw.ts';
 export {
   RETRIES,

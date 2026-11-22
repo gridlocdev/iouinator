@@ -176,7 +176,7 @@ button.iou-ledger-name:hover {
   text-align: left;
   font-size: 11px;
 }
-.iou-transaction-fields .iou-field select,
+.iou-transaction-fields .iou-picker-button,
 .iou-transaction-fields .iou-field input {
   width: 100%;
   min-width: 0;
@@ -364,6 +364,63 @@ button.iou-ledger-name:hover {
   height: 1px;
   margin: 4px 6px;
   background: var(--iou-line);
+}
+
+/* The From and To pickers: a button like a field, and the page's own list under it (PRD §4.3). */
+.iou-picker-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 28px;
+  padding: 0 6px 0 8px;
+  border: 1px solid var(--iou-line-strong);
+  border-radius: var(--iou-radius);
+  background: var(--iou-field);
+  color: inherit;
+  text-align: left;
+}
+.iou-picker-button[aria-expanded='true'] {
+  border-color: var(--iou-accent);
+}
+.iou-picker-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.iou-picker-button .iou-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--iou-text-2);
+}
+.iou-picker-list {
+  position: fixed;
+  z-index: 40;
+  max-height: min(320px, 60vh);
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--iou-line);
+  border-radius: 8px;
+  background: var(--iou-raised);
+  box-shadow: var(--iou-shadow);
+}
+.iou-picker-option {
+  display: flex;
+  gap: 6px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  cursor: default;
+}
+.iou-picker-option[aria-selected='true'] {
+  background: var(--iou-accent);
+  color: var(--iou-accent-text);
+}
+.iou-picker-check {
+  width: 1em;
+  text-align: center;
 }
 
 /* Narrower windows: the diagram goes under the other two, then everything stacks. */

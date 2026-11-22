@@ -26,16 +26,20 @@ In a browser tab, **⌘N** (**Ctrl+N**) belongs to the browser, which opens a ne
 
 ## Transactions
 
-| Action                                  | macOS                       | Windows / Linux               |
-| --------------------------------------- | --------------------------- | ----------------------------- |
-| New transaction: go to the Amount field | **N**                       | **N**                         |
-| Add the transaction you typed           | **↩**                       | **Enter**                     |
-| Previous / next transaction in the list | **↑** / **↓**               | **Up** / **Down**             |
-| First / last transaction                | **↖** / **↘**               | **Home** / **End**            |
-| Edit the chosen transaction             | **↩** or double-click       | **Enter** or double-click     |
-| Delete the chosen transaction           | **⌦** or **⌫**              | **Delete** or **Backspace**   |
-| Swap direction, edit or delete          | right-click the transaction | right-click the transaction   |
-| Undo / redo a change to the ledger      | **⌘Z** / **⇧⌘Z**            | **Ctrl+Z** / **Ctrl+Shift+Z** |
+| Action | macOS | Windows / Linux |
+| --- | --- | --- |
+| New transaction: go to the Amount field | **N** | **N** |
+| Add the transaction you typed | **↩** | **Enter** |
+| Open the From or To list | **Space** or **↓** | **Space** or **Down** |
+| Move through an open From or To list | **⇥** / **⇧⇥** or **↓** / **↑** | **Tab** / **Shift+Tab** or **Down** / **Up** |
+| Pick the name, or close the list without picking | **↩** / **Esc** | **Enter** / **Esc** |
+| Jump to a name in From or To | its first letter | its first letter |
+| Previous / next transaction in the list | **↑** / **↓** | **Up** / **Down** |
+| First / last transaction | **↖** / **↘** | **Home** / **End** |
+| Edit the chosen transaction | **↩** or double-click | **Enter** or double-click |
+| Delete the chosen transaction | **⌦** or **⌫** | **Delete** or **Backspace** |
+| Swap direction, edit or delete | right-click the transaction | right-click the transaction |
+| Undo / redo a change to the ledger | **⌘Z** / **⇧⌘Z** | **Ctrl+Z** / **Ctrl+Shift+Z** |
 
 ## Diagram
 

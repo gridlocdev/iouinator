@@ -1,5 +1,5 @@
 // Shared scenario setup. Every page starts with empty browser storage, so settings and the ledger start fresh.
-import { expect, test as base, type Page } from '@playwright/test';
+import { expect, test as base, type Locator, type Page } from '@playwright/test';
 
 export { expect };
 
@@ -46,6 +46,13 @@ export async function addPeople(page: Page, ...names: string[]): Promise<void> {
 }
 
 /** Records a transaction with the form: `from` owes `to` `amount` for `description`. */
+/** Picks a name in a From or To picker with the mouse. */
+export async function choosePerson(picker: Locator, name: string): Promise<void> {
+  await picker.click();
+  await picker.page().getByRole('option', { name, exact: true }).click();
+  await expect(picker).toHaveText(name);
+}
+
 export async function addTransaction(
   page: Page,
   from: string,
@@ -54,8 +61,8 @@ export async function addTransaction(
   description: string,
 ): Promise<void> {
   const form = page.getByRole('form', { name: 'New transaction' });
-  await form.getByLabel('From').selectOption({ label: from });
-  await form.getByLabel('To').selectOption({ label: to });
+  await choosePerson(form.getByRole('combobox', { name: 'From' }), from);
+  await choosePerson(form.getByRole('combobox', { name: 'To' }), to);
   await form.getByLabel('Amount').fill(amount);
   await form.getByLabel('For').fill(description);
   await form.getByLabel('For').press('Enter');

@@ -2,6 +2,7 @@
 import { useState } from 'preact/hooks';
 import { MAX_DESCRIPTION, parseAmount, type Ledger, type TransactionFields as Fields } from '@iouinator/core';
 import type { AppController } from './controller.ts';
+import { PersonPicker } from './PersonPicker.tsx';
 
 export interface DraftValues {
   readonly from: string;
@@ -74,44 +75,26 @@ export function TransactionFields({
   const described = draft.error ? errorId : undefined;
   return (
     <div class="iou-transaction-fields">
-      <label class="iou-field">
-        <span>From</span>
-        <select
-          value={from}
-          aria-describedby={described}
-          onChange={(e) => {
-            const next = e.currentTarget.value;
-            // Picking the person in To swaps the two, so From and To never match.
-            draft.set(next === to ? { from: next, to: from } : { from: next });
-          }}
-        >
-          {people.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <PersonPicker
+        id={`${idPrefix}-from`}
+        label="From"
+        people={people}
+        value={from}
+        describedBy={described}
+        // Picking the person in To swaps the two, so From and To never match.
+        onPick={(next) => draft.set(next === to ? { from: next, to: from } : { from: next })}
+      />
       <span class="iou-owes-word" aria-hidden="true">
         owes
       </span>
-      <label class="iou-field">
-        <span>To</span>
-        <select
-          value={to}
-          aria-describedby={described}
-          onChange={(e) => {
-            const next = e.currentTarget.value;
-            draft.set(next === from ? { to: next, from: to } : { to: next });
-          }}
-        >
-          {people.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <PersonPicker
+        id={`${idPrefix}-to`}
+        label="To"
+        people={people}
+        value={to}
+        describedBy={described}
+        onPick={(next) => draft.set(next === from ? { to: next, from: to } : { to: next })}
+      />
       <label class="iou-field iou-field-amount">
         <span>Amount</span>
         <input

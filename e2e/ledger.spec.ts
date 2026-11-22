@@ -103,6 +103,62 @@ test.describe('Transactions', () => {
     await expect(notice(page)).toContainText('Deleted Rent.');
     await expect(transactionList(page).getByRole('option')).toHaveCount(1);
   });
+
+  test('From and To: while the list is open, Tab and Shift+Tab move through the names', async ({ page }) => {
+    await addPeople(page, 'Sam', 'Alex', 'Jo');
+    const form = page.getByRole('form', { name: 'New transaction' });
+    const from = form.getByRole('combobox', { name: 'From' });
+    const to = form.getByRole('combobox', { name: 'To' });
+    const chosen = page.getByRole('listbox').getByRole('option', { selected: true });
+
+    // Closed, Tab goes on to the next field.
+    await from.focus();
+    await page.keyboard.press('Tab');
+    await expect(to).toBeFocused();
+
+    await page.keyboard.press('Space');
+    await expect(to).toHaveAttribute('aria-expanded', 'true');
+    await expect(chosen).toHaveText(/Alex/);
+    await page.keyboard.press('Tab');
+    await expect(chosen).toHaveText(/Jo/);
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Shift+Tab');
+    await expect(chosen).toHaveText(/Sam/);
+    await expect(to, 'focus stays on the picker').toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+    await expect(to).toHaveAttribute('aria-expanded', 'false');
+    await expect(to).toHaveText('Jo');
+
+    // Picking the person in the other picker swaps the two.
+    await from.click();
+    await page.getByRole('option', { name: 'Jo', exact: true }).click();
+    await expect(from).toHaveText('Jo');
+    await expect(to).toHaveText('Sam');
+
+    // A letter jumps to a name; Enter while closed adds, like the other fields.
+    await to.focus();
+    await page.keyboard.press('a');
+    await expect(to).toHaveText('Alex');
+    await form.getByLabel('Amount').fill('7');
+    await form.getByLabel('For').fill('Snacks');
+    await to.press('Enter');
+    await expect(row(page, 'Jo owes Alex $7.00 for Snacks')).toBeVisible();
+
+    // In Edit Transaction, Escape closes the list, not the dialog.
+    await row(page, 'Jo owes Alex $7.00 for Snacks').dblclick();
+    const edit = page.getByRole('dialog', { name: 'Edit Transaction' });
+    const editTo = edit.getByRole('combobox', { name: 'To' });
+    await editTo.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(editTo).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Escape');
+    await expect(editTo).toHaveAttribute('aria-expanded', 'false');
+    await expect(editTo).toHaveText('Alex');
+    await expect(edit).toBeVisible();
+  });
 });
 
 test.describe('Who owes whom', () => {
