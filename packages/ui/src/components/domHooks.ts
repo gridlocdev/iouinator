@@ -1,0 +1,118 @@
+/**
+ * The page's only effects outside the shared components. Each one keeps a piece of the DOM in step with the
+ * model (focus, a scroll position, a drawing, a popup's place); none copies one piece of state into another.
+ */
+import type { RefObject } from 'preact';
+import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
+
+/** Focuses the element each time `when` turns true, before the next key can land anywhere else. */
+export function useFocusWhen(ref: RefObject<HTMLElement | null>, when: boolean): void {
+  useLayoutEffect(() => {
+    if (when) ref.current?.focus();
+  }, [ref, when]);
+}
+
+/**
+ * Keeps the keyboard in a popup menu: focuses its first enabled button when it opens, calls `onClose` on a
+ * pointer press outside it or when the window loses focus, and gives focus back to where it was on closing.
+ */
+export function usePopupFocus(ref: RefObject<HTMLElement | null>, onClose: () => void): void {
+  useLayoutEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    ref.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
+    const away = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) onClose();
+    };
+    window.addEventListener('pointerdown', away, true);
+    window.addEventListener('blur', onClose);
+    return () => {
+      window.removeEventListener('pointerdown', away, true);
+      window.removeEventListener('blur', onClose);
+      const now = document.activeElement;
+      if (previous?.isConnected && (now === null || now === document.body || ref.current?.contains(now)))
+        previous.focus();
+    };
+  }, [ref, onClose]);
+}
+
+/** Focuses the element each time `request` changes to a new number above 0: a command asked for it. */
+export function useFocusRequest(ref: RefObject<HTMLElement | null>, request: number): void {
+  useLayoutEffect(() => {
+    if (request > 0) ref.current?.focus();
+  }, [ref, request]);
+}
+
+/** Scrolls the element inside `ref` that `selector` finds into view whenever the selector changes. */
+export function useScrollIntoView(ref: RefObject<HTMLElement | null>, selector: string | null): void {
+  useEffect(() => {
+    if (selector !== null) ref.current?.querySelector(selector)?.scrollIntoView({ block: 'nearest' });
+  }, [ref, selector]);
+}
+
+/** Whether a media query matches now, following its changes. */
+export function useMediaQuery(query: string): boolean {
+  const list = typeof matchMedia === 'function' ? matchMedia(query) : null;
+  const [matches, setMatches] = useState(list?.matches ?? false);
+  useEffect(() => {
+    if (!list) return;
+    const changed = () => setMatches(list.matches);
+    changed();
+    list.addEventListener('change', changed);
+    return () => list.removeEventListener('change', changed);
+  }, [query]);
+  return matches;
+}
+
+/**
+ * Puts the markup `make` resolves to into the element each time `key` changes, then calls `after` on the
+ * element. Markup that arrives after a newer `make` started is dropped. Returns true while the last one failed.
+ */
+export function useAsyncMarkup(
+  ref: RefObject<HTMLElement | null>,
+  key: string,
+  make: () => Promise<string>,
+  after: (el: HTMLElement) => void,
+): boolean {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let current = true;
+    make().then(
+      (markup) => {
+        if (!current || !ref.current) return;
+        ref.current.innerHTML = markup;
+        setFailed(false);
+        after(ref.current);
+      },
+      (e: unknown) => {
+        if (!current) return;
+        console.warn('Couldn’t draw:', e);
+        if (ref.current) ref.current.innerHTML = '';
+        setFailed(true);
+      },
+    );
+    return () => {
+      current = false;
+    };
+  }, [ref, key]);
+  return failed;
+}
+
+/**
+ * Where a popup opened at `point` goes so it stays in the window: flipped up or left when it would run off.
+ * Null until it has been measured; keep it hidden till then.
+ */
+export function usePopupPlace(
+  ref: RefObject<HTMLElement | null>,
+  point: { readonly x: number; readonly y: number },
+): { x: number; y: number } | null {
+  const [at, setAt] = useState<{ x: number; y: number } | null>(null);
+  useLayoutEffect(() => {
+    const w = ref.current?.offsetWidth ?? 0;
+    const h = ref.current?.offsetHeight ?? 0;
+    setAt({
+      x: point.x + w > innerWidth - 4 ? Math.max(4, point.x - w) : point.x,
+      y: point.y + h > innerHeight - 4 ? Math.max(4, point.y - h) : point.y,
+    });
+  }, [ref, point.x, point.y]);
+  return at;
+}

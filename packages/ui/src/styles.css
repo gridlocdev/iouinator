@@ -1,0 +1,457 @@
+/*
+ * IOUinator: theme tokens and the shared component styles (PRD §11). Light by default; [data-theme] or the
+ * system picks dark. Greys for the window and keys, one accent for operators and focus.
+ */
+:root {
+  --iou-window: #ececee;
+  --iou-sidebar: #f6f6f8;
+  --iou-key-shadow: 0 1px 1px rgba(0, 0, 0, 0.07), 0 0 0 0.5px rgba(0, 0, 0, 0.07);
+  --iou-key-hover: 0.97;
+  --iou-key-down: 0.88;
+  --iou-raised: #ffffff;
+  --iou-field: #ffffff;
+  --iou-display: #fbfbfc;
+  --iou-key: #ffffff;
+  --iou-key-fn: #e2e2e6;
+  --iou-key-op: var(--iou-accent);
+  --iou-key-op-text: #ffffff;
+  --iou-hover: rgba(0, 0, 0, 0.05);
+  --iou-pressed: rgba(0, 0, 0, 0.12);
+  --iou-line: #dcdce0;
+  --iou-line-strong: #c4c4ca;
+  --iou-text: #1d1d1f;
+  --iou-text-2: #5f6068;
+  --iou-text-3: #8e8f97;
+  --iou-accent: #1f8f4e;
+  --iou-accent-soft: color-mix(in srgb, var(--iou-accent) 16%, transparent);
+  --iou-accent-text: #ffffff;
+  --iou-danger: #d13438;
+  --iou-shadow: 0 12px 36px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --iou-backdrop: rgba(0, 0, 0, 0.28);
+  color-scheme: light;
+  --iou-radius: 6px;
+  --iou-status: 24px;
+  --iou-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --iou-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --iou-window: #1c1c1e;
+    --iou-sidebar: #242427;
+    --iou-key-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.07);
+    --iou-key-hover: 1.12;
+    --iou-key-down: 1.32;
+    --iou-raised: #2c2c2f;
+    --iou-field: #232326;
+    --iou-display: #161618;
+    --iou-key: #3a3a3d;
+    --iou-key-fn: #2a2a2d;
+    --iou-key-op: var(--iou-accent);
+    --iou-key-op-text: #ffffff;
+    --iou-hover: rgba(255, 255, 255, 0.07);
+    --iou-pressed: rgba(255, 255, 255, 0.14);
+    --iou-line: #333336;
+    --iou-line-strong: #48484c;
+    --iou-text: #ececee;
+    --iou-text-2: #a8a8b0;
+    --iou-text-3: #7c7c85;
+    --iou-accent: #3cc27a;
+    --iou-accent-soft: color-mix(in srgb, var(--iou-accent) 24%, transparent);
+    --iou-accent-text: #ffffff;
+    --iou-danger: #ff6b6b;
+    --iou-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --iou-backdrop: rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --iou-window: #1c1c1e;
+  --iou-sidebar: #242427;
+  --iou-key-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.07);
+  --iou-key-hover: 1.12;
+  --iou-key-down: 1.32;
+  --iou-raised: #2c2c2f;
+  --iou-field: #232326;
+  --iou-display: #161618;
+  --iou-key: #3a3a3d;
+  --iou-key-fn: #2a2a2d;
+  --iou-key-op: var(--iou-accent);
+  --iou-key-op-text: #ffffff;
+  --iou-hover: rgba(255, 255, 255, 0.07);
+  --iou-pressed: rgba(255, 255, 255, 0.14);
+  --iou-line: #333336;
+  --iou-line-strong: #48484c;
+  --iou-text: #ececee;
+  --iou-text-2: #a8a8b0;
+  --iou-text-3: #7c7c85;
+  --iou-accent: #3cc27a;
+  --iou-accent-soft: color-mix(in srgb, var(--iou-accent) 24%, transparent);
+  --iou-accent-text: #ffffff;
+  --iou-danger: #ff6b6b;
+  --iou-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --iou-backdrop: rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    /* None at all: a 0.01 ms transition still turns every style change into an animation, which a paused clock
+       never finishes. */
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+html {
+  overscroll-behavior: none;
+}
+/* A desktop app, not a page: the arrow cursor, and only text fields select text. */
+body {
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  font: 13px/1.4 var(--iou-font);
+  color: var(--iou-text);
+  background: var(--iou-window);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+img,
+svg {
+  -webkit-user-drag: none;
+}
+:focus-visible {
+  outline: 2px solid var(--iou-accent);
+  outline-offset: 1px;
+}
+kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  padding: 0 5px;
+  border: 1px solid var(--iou-line-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font: 11px/1.6 var(--iou-font);
+  text-align: center;
+  color: var(--iou-text-2);
+  background: var(--iou-raised);
+}
+.iou-icon {
+  display: inline-flex;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.iou-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.iou-visually-hidden,
+.iou-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Buttons */
+.iou-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--iou-radius);
+  background: none;
+  color: var(--iou-text-2);
+  cursor: default;
+}
+.iou-icon-button:hover {
+  background: var(--iou-hover);
+  color: var(--iou-text);
+}
+.iou-icon-button:active {
+  background: var(--iou-pressed);
+}
+.iou-icon-button.iou-small {
+  width: 20px;
+  height: 20px;
+}
+.iou-icon-button.iou-small .iou-icon {
+  width: 13px;
+  height: 13px;
+}
+.iou-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--iou-line-strong);
+  border-radius: var(--iou-radius);
+  background: var(--iou-raised);
+  cursor: default;
+  font-weight: 500;
+}
+.iou-button:hover {
+  background: color-mix(in srgb, var(--iou-raised) 92%, var(--iou-text));
+}
+.iou-button-primary {
+  border-color: var(--iou-accent);
+  background: var(--iou-accent);
+  color: var(--iou-accent-text);
+}
+.iou-button-primary:hover {
+  background: color-mix(in srgb, var(--iou-accent) 88%, #000);
+}
+.iou-button-danger {
+  border-color: var(--iou-danger);
+  background: var(--iou-danger);
+  color: #fff;
+}
+.iou-link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--iou-accent);
+  font-weight: 600;
+  cursor: default;
+}
+.iou-link-button:hover {
+  text-decoration: underline;
+}
+
+/* Segmented control (Settings choices) */
+.iou-segmented {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 7px;
+  background: var(--iou-pressed);
+}
+.iou-segmented button {
+  height: 24px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--iou-text-2);
+  font-weight: 500;
+  cursor: default;
+}
+.iou-segmented button:hover {
+  color: var(--iou-text);
+}
+.iou-segmented button[aria-pressed='true'],
+.iou-segmented button[aria-checked='true'] {
+  background: var(--iou-raised);
+  color: var(--iou-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* Dialogs */
+.iou-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--iou-backdrop);
+}
+.iou-backdrop-top {
+  align-items: flex-start;
+  padding-top: 12vh;
+}
+.iou-dialog:focus {
+  outline: none;
+}
+.iou-dialog {
+  width: 440px;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  background: var(--iou-raised);
+  box-shadow: var(--iou-shadow);
+}
+.iou-dialog-wide {
+  width: 660px;
+}
+.iou-dialog form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.iou-dialog h2 {
+  margin: 0;
+  padding: 18px 20px 4px;
+  font-size: 15px;
+  font-weight: 650;
+}
+.iou-dialog-body {
+  padding: 10px 20px;
+  overflow-y: auto;
+}
+.iou-dialog-body p {
+  margin: 0 0 10px;
+}
+.iou-choices {
+  margin: 0;
+  padding-left: 18px;
+}
+.iou-choices li {
+  margin-bottom: 6px;
+}
+.iou-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 18px;
+}
+.iou-field {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.iou-field > span {
+  color: var(--iou-text-2);
+  text-align: right;
+}
+.iou-field select,
+.iou-field input:not([type='checkbox']) {
+  justify-self: start;
+  min-width: 160px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--iou-line-strong);
+  border-radius: var(--iou-radius);
+  background: var(--iou-field);
+}
+.iou-field input[type='checkbox'] {
+  justify-self: start;
+  margin: 0;
+}
+
+/* Command menu */
+.iou-palette {
+  width: 560px;
+  overflow: hidden;
+}
+.iou-palette input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--iou-line);
+  background: none;
+  font-size: 15px;
+  outline: none;
+}
+.iou-palette ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.iou-palette li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  cursor: default;
+}
+.iou-palette li[aria-selected='true'] {
+  background: var(--iou-accent-soft);
+}
+.iou-palette li.iou-disabled {
+  opacity: 0.45;
+}
+.iou-palette-title {
+  flex: 1;
+}
+.iou-palette-group {
+  color: var(--iou-text-3);
+  font-size: 12px;
+}
+.iou-palette-empty {
+  margin: 0;
+  padding: 14px 16px;
+  color: var(--iou-text-2);
+}
+
+/* Keyboard Shortcuts */
+.iou-shortcuts {
+  columns: 2 260px;
+  column-gap: 28px;
+}
+.iou-shortcuts section {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
+.iou-shortcuts h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--iou-text-2);
+}
+.iou-shortcuts dl {
+  margin: 0;
+}
+.iou-shortcut {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+}
+.iou-shortcut dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.iou-way {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+.iou-or {
+  color: var(--iou-text-3);
+  font-size: 11px;
+  margin-right: 2px;
+}

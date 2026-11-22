@@ -1,0 +1,526 @@
+/* IOUinator's own layout (PRD §9). Shared pieces (buttons, dialogs, the command menu) are in @iouinator/ui. */
+
+.iou-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* The top bar: the ledger's name and the Raw / Flattened switch. */
+.iou-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--iou-line);
+}
+.iou-ledger-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--iou-radius);
+  background: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+.iou-ledger-name span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+button.iou-ledger-name:hover {
+  background: var(--iou-hover);
+}
+.iou-view-switch {
+  flex: none;
+}
+
+/* Three panes side by side: people, transactions, the diagram. */
+.iou-body {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(320px, 1fr) minmax(320px, 1.1fr);
+  flex: 1;
+  min-height: 0;
+}
+.iou-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px;
+  overflow: auto;
+}
+.iou-pane + .iou-pane {
+  border-left: 1px solid var(--iou-line);
+}
+.iou-people {
+  background: var(--iou-sidebar);
+}
+.iou-pane-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--iou-text-3);
+}
+.iou-empty {
+  margin: 0;
+  color: var(--iou-text-3);
+}
+.iou-field-error {
+  margin: 0;
+  color: var(--iou-danger);
+  font-size: 12px;
+}
+.iou-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.iou-app input[type='text'],
+.iou-app select {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--iou-line-strong);
+  border-radius: var(--iou-radius);
+  background: var(--iou-field);
+  min-width: 0;
+}
+.iou-app input[aria-invalid='true'] {
+  border-color: var(--iou-danger);
+}
+
+/* People */
+.iou-add-person {
+  display: flex;
+  gap: 6px;
+}
+.iou-add-person input {
+  flex: 1;
+}
+.iou-person-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.iou-person {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--iou-radius);
+  background: none;
+  text-align: left;
+}
+.iou-person:hover {
+  background: var(--iou-hover);
+}
+.iou-person[aria-pressed='true'] {
+  background: var(--iou-accent-soft);
+}
+.iou-person-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.iou-balance {
+  flex: none;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--iou-text-3);
+}
+.iou-balance.iou-owed {
+  color: var(--iou-accent);
+}
+.iou-balance.iou-owes {
+  color: var(--iou-danger);
+}
+
+/* Transactions: the form, the filter, the list. */
+.iou-transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--iou-line);
+}
+.iou-transaction-form > .iou-button {
+  align-self: flex-end;
+}
+.iou-transaction-fields {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: end;
+}
+.iou-transaction-fields .iou-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+}
+.iou-transaction-fields .iou-field > span {
+  align-self: flex-start;
+  text-align: left;
+  font-size: 11px;
+}
+.iou-transaction-fields .iou-field select,
+.iou-transaction-fields .iou-field input {
+  width: 100%;
+  min-width: 0;
+}
+.iou-owes-word {
+  padding-bottom: 6px;
+  color: var(--iou-text-3);
+}
+.iou-field-amount {
+  grid-column: 1;
+}
+.iou-field-for {
+  grid-column: 2 / -1;
+}
+.iou-transaction-fields .iou-field-error {
+  grid-column: 1 / -1;
+}
+.iou-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--iou-radius);
+  background: var(--iou-accent-soft);
+}
+.iou-transaction-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--iou-line);
+  border-radius: var(--iou-radius);
+  background: var(--iou-raised);
+}
+.iou-transaction-list:focus-visible {
+  outline-offset: 2px;
+}
+.iou-transaction {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--iou-line);
+  cursor: default;
+}
+.iou-transaction:last-child {
+  border-bottom: 0;
+}
+.iou-transaction[aria-selected='true'] {
+  background: var(--iou-hover);
+}
+.iou-transaction-list:focus .iou-transaction[aria-selected='true'] {
+  background: var(--iou-accent);
+  color: var(--iou-accent-text);
+}
+.iou-transaction-list:focus .iou-transaction[aria-selected='true'] .iou-transaction-for {
+  color: inherit;
+}
+.iou-transaction-who {
+  display: inline-flex;
+  gap: 4px;
+  white-space: nowrap;
+}
+.iou-arrow {
+  opacity: 0.6;
+}
+.iou-transaction-for {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--iou-text-2);
+}
+.iou-transaction-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The diagram and the Totals table. */
+.iou-flatten-summary {
+  margin: 0;
+  color: var(--iou-text-2);
+}
+.iou-figure {
+  margin: 0;
+}
+.iou-drawing {
+  display: flex;
+  justify-content: center;
+  min-height: 120px;
+  padding: 8px;
+  border: 1px solid var(--iou-line);
+  border-radius: var(--iou-radius);
+  background: var(--iou-raised);
+  overflow: auto;
+}
+.iou-drawing svg {
+  max-width: 100%;
+  height: auto;
+}
+.iou-drawing .iou-clickable {
+  cursor: pointer;
+}
+.iou-drawing g.iou-clickable:hover rect,
+.iou-drawing path.iou-clickable:hover {
+  filter: brightness(1.15);
+}
+.iou-totals {
+  width: 100%;
+  border-collapse: collapse;
+}
+.iou-totals caption {
+  padding-bottom: 4px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--iou-text-3);
+}
+.iou-totals th {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--iou-line-strong);
+  text-align: left;
+  font-weight: 500;
+  color: var(--iou-text-2);
+}
+.iou-totals th.iou-num {
+  text-align: right;
+}
+.iou-totals td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--iou-line);
+}
+.iou-totals tr.iou-row-on {
+  background: var(--iou-accent-soft);
+}
+.iou-total {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--iou-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Right-click menu */
+.iou-context-menu {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: 4px;
+  border: 1px solid var(--iou-line);
+  border-radius: 8px;
+  background: var(--iou-raised);
+  box-shadow: var(--iou-shadow);
+}
+.iou-context-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  text-align: left;
+}
+.iou-context-item:hover:not(:disabled),
+.iou-context-item:focus {
+  outline: none;
+  background: var(--iou-accent);
+  color: var(--iou-accent-text);
+}
+.iou-context-item:disabled {
+  color: var(--iou-text-3);
+}
+.iou-context-item.iou-danger:not(:hover, :focus) {
+  color: var(--iou-danger);
+}
+.iou-context-item kbd {
+  border: 0;
+  background: none;
+  color: inherit;
+  opacity: 0.7;
+}
+.iou-context-sep {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--iou-line);
+}
+
+/* Narrower windows: the diagram goes under the other two, then everything stacks. */
+@media (max-width: 899px) {
+  .iou-body {
+    grid-template-columns: minmax(160px, 200px) 1fr;
+    grid-auto-rows: minmax(0, auto);
+    overflow: auto;
+  }
+  .iou-pane {
+    overflow: visible;
+  }
+  .iou-diagram {
+    grid-column: 1 / -1;
+    border-left: 0 !important;
+    border-top: 1px solid var(--iou-line);
+  }
+}
+@media (max-width: 599px) {
+  .iou-body {
+    display: block;
+  }
+  .iou-pane + .iou-pane {
+    border-left: 0;
+    border-top: 1px solid var(--iou-line);
+  }
+}
+
+.iou-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--iou-status);
+  padding: 0 6px 0 14px;
+  border-top: 1px solid var(--iou-line);
+  font-size: 11px;
+  color: var(--iou-text-3);
+}
+.iou-notice {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.iou-notice-error {
+  color: var(--iou-danger);
+}
+
+/* Ledger folder dialogs */
+.iou-field-wide {
+  grid-template-columns: auto 1fr;
+}
+.iou-field-wide input:not([type='checkbox']) {
+  justify-self: stretch;
+}
+.iou-field-error {
+  color: var(--iou-danger);
+}
+.iou-trash {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.iou-trash li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--iou-line);
+}
+.iou-trash li:last-child {
+  border-bottom: 0;
+}
+.iou-trash span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Settings: labels right-aligned in one column, every control and checkbox in the other, at any width. */
+.iou-settings {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 12px;
+}
+.iou-settings .iou-field {
+  display: contents;
+}
+.iou-settings .iou-segmented {
+  display: flex;
+  min-width: 0;
+}
+.iou-settings .iou-segmented button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.iou-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.iou-settings .iou-check {
+  grid-column: 2;
+}
+.iou-settings .iou-check:first-of-type {
+  margin-top: 4px;
+}
+/* Too narrow for two columns: each label goes above its control. */
+@media (max-width: 380px) {
+  .iou-settings {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 6px;
+  }
+  .iou-settings .iou-field > span {
+    text-align: left;
+  }
+  .iou-settings .iou-segmented {
+    margin-bottom: 6px;
+  }
+  .iou-settings .iou-check {
+    grid-column: 1;
+  }
+}
+
+/*
+ * macOS desktop app: no title bar. The top bar holds the traffic lights and drags the window; the window is
+ * translucent behind the page, so the people pane lets the desktop through a little.
+ */
+html.iou-unified {
+  --iou-titlebar: 44px;
+  background: transparent;
+}
+html.iou-unified.iou-fullscreen {
+  --iou-titlebar: 0px;
+}
+html.iou-unified body {
+  background: color-mix(in srgb, var(--iou-window) 78%, transparent);
+}
+html.iou-unified .iou-people {
+  background: color-mix(in srgb, var(--iou-sidebar) 70%, transparent);
+}
+html.iou-unified .iou-top {
+  min-height: max(44px, var(--iou-titlebar));
+  padding-left: max(12px, calc(var(--iou-titlebar) * 1.8));
+  -webkit-app-region: drag;
+}
+html.iou-unified :is(button, input, select, textarea, a, [role='menu'], [role='dialog']) {
+  -webkit-app-region: no-drag;
+}

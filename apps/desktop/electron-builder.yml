@@ -1,0 +1,26 @@
+appId: dev.gridloc.iouinator
+productName: IOUinator
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**
+  - package.json
+  # The window icon on Linux and Windows (macOS takes the bundle's icon.icns).
+  - build/icon.png
+asar: true
+# One naming scheme on every system: IOUinator-0.1.0-mac-arm64.dmg, IOUinator-0.1.0-win-x64.exe, …
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+mac:
+  category: public.app-category.utilities
+  target: [dmg, zip]
+  hardenedRuntime: true
+  # Ad-hoc signature, so Apple silicon will run a local build. Swap for a Developer ID to distribute.
+  identity: '-'
+linux:
+  target: [AppImage]
+  # The package name (@iouinator/desktop) isn't a usable file name.
+  executableName: iouinator
+  category: Utility
+win:
+  target: [nsis]

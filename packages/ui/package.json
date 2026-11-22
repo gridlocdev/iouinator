@@ -1,0 +1,20 @@
+{
+  "name": "@iouinator/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "dependencies": {
+    "@iouinator/core": "workspace:*",
+    "@preact/signals": "2.11.4",
+    "preact": "11.1.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "2.10.6",
+    "vite": "8.3.5"
+  }
+}

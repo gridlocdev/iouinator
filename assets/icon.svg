@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IOUinator's icon source: three people joined by arrows in a loop, on a green tile. 1024 canvas on Apple's icon
+     grid: an 824-unit tile at (100,100) with a transparent margin. scripts/make-icons.sh crops to the tile for
+     Windows and Linux, so the tile stays there. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="tile" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="924">
+      <stop offset="0" stop-color="#3CC27A" />
+      <stop offset="1" stop-color="#17703C" />
+    </linearGradient>
+    <marker id="head" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="2.6" markerHeight="2.6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#FFFFFF" />
+    </marker>
+  </defs>
+
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#tile)" />
+
+  <!-- Arrows between the three people, clockwise, ending short of each circle for the heads. -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="38" stroke-linecap="round" marker-end="url(#head)">
+    <path d="M616 335 A230 230 0 0 1 735 484" />
+    <path d="M637 733 A230 230 0 0 1 449 761" />
+    <path d="M282 552 A230 230 0 0 1 352 375" />
+  </g>
+
+  <!-- The three people. -->
+  <g fill="#FFFFFF">
+    <circle cx="512" cy="310" r="82" />
+    <circle cx="711" cy="655" r="82" />
+    <circle cx="313" cy="655" r="82" />
+  </g>
+</svg>
