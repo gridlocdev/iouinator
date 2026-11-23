@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### What's new
+
+- **Open a folder in Firefox and Safari.** **Open Ledger Folder…** now works in Firefox and Safari too. They can open a folder only to read it, so its ledgers show with their diagram and can be exported, while commands that would change them are off and say why. Ledgers in the browser's own storage stay editable.
+
 ## 1.0.0
 
 The first release of IOUinator, which keeps track of who owes whom in a group. You list the people, record each debt with an amount and what it was for, and a diagram shows the totals between everyone. It runs on macOS, Windows and Linux, and in the browser.

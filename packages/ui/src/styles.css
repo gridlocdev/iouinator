@@ -409,6 +409,11 @@ kbd {
   color: var(--iou-text-3);
   font-size: 12px;
 }
+.iou-palette-why {
+  color: var(--iou-text-3);
+  font-size: 12px;
+  font-style: italic;
+}
 .iou-palette-empty {
   margin: 0;
   padding: 14px 16px;

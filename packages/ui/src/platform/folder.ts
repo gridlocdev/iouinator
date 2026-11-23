@@ -18,7 +18,9 @@ export type StoreErrorKind =
   /** A move's source is gone. */
   | 'missing'
   /** A bad name: empty, or with a `/`, `\` or a leading `.`. */
-  | 'name';
+  | 'name'
+  /** The folder can't be written: a folder Firefox or Safari picked (PRD §8.2). */
+  | 'readOnly';
 
 export class StoreError extends Error {
   readonly kind: StoreErrorKind;
@@ -33,6 +35,8 @@ export class StoreError extends Error {
 export interface Folder {
   /** What the app calls the place: the folder's name, or "this browser". */
   readonly label: string;
+  /** Why nothing in the folder can be changed; absent when it can (PRD §8.2). */
+  readonly readOnly?: string;
   /** The names of the files directly in `dir` (`''` is the folder itself); none when `dir` is missing. */
   list(dir: string): Promise<string[]>;
   /** The file's text and version, or null when there is no such file. */

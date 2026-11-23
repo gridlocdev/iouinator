@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { MemoryFolder } from '@iouinator/ui';
+import { MemoryFolder, READ_ONLY_REASON } from '@iouinator/ui';
+import { filesFolder } from '../src/index.ts';
 import { ledgerFile, makeFolderApp, people, summary } from './helpers.ts';
 
 const SAM = ledgerFile({ people: [{ id: 'p1', name: 'Sam' }] });
@@ -104,5 +105,74 @@ describe('the File commands (PRD §8.2)', () => {
     catalog.run('app.settings');
     catalog.run('file.open');
     expect(app.dialog.value).toBe('conflict');
+  });
+});
+
+/** Files as `<input webkitdirectory>` gives them for a folder called Shared. */
+function pickedFiles(files: Readonly<Record<string, string>>): File[] {
+  return Object.entries(files).map(([path, text]) => {
+    const file = new File([text], path);
+    Object.defineProperty(file, 'webkitRelativePath', { value: `Shared/${path}` });
+    return file;
+  });
+}
+
+describe('a folder Firefox or Safari opened, read-only (PRD §8.2)', () => {
+  it('opens its ledgers to read, and turns off every command that writes, saying why', async () => {
+    const { app, catalog, folders, state } = makeFolderApp({
+      folder: new MemoryFolder('Mine'),
+      key: 'browser',
+    });
+    await folders.start();
+    state.choice = await filesFolder(pickedFiles({ 'Trip.iou.json': SAM }));
+    await folders.choose();
+    expect(folders.current.value?.name.value).toBe('Trip');
+    expect(summary(app.ledger.value)).toEqual(['Sam']);
+    expect(app.readOnly.value).toBe(READ_ONLY_REASON);
+
+    for (const id of [
+      'file.new',
+      'file.rename',
+      'file.delete',
+      'file.trash',
+      'person.add',
+      'transaction.new',
+    ]) {
+      const c = catalog.get(id)!;
+      expect(catalog.isEnabled(c), id).toBe(false);
+      expect(catalog.whyDisabled(c), id).toBe(READ_ONLY_REASON);
+    }
+    for (const id of ['file.open', 'file.export', 'view.flatten', 'edit.copyMermaid'])
+      expect(catalog.isEnabled(catalog.get(id)!), id).toBe(true);
+
+    expect(app.addPerson('Kim')).toBe(READ_ONLY_REASON);
+    expect(summary(app.ledger.value)).toEqual(['Sam']);
+    await folders.exportLedger();
+    expect(state.exported).toEqual([['Trip', SAM]]);
+  });
+
+  it('going back to the browser’s own storage makes the ledger editable again', async () => {
+    const { app, folders, state } = makeFolderApp({ folder: new MemoryFolder('Mine'), key: 'browser' });
+    await folders.start();
+    state.choice = await filesFolder(pickedFiles({ 'Trip.iou.json': SAM }));
+    await folders.choose();
+    await folders.useDefault();
+    expect(app.readOnly.value).toBe(null);
+    expect(app.addPerson('Kim')).toBe(null);
+  });
+
+  it('refuses a folder with no ledgers, and one whose ledgers can’t be opened', async () => {
+    await expect(filesFolder(pickedFiles({ 'notes.txt': 'x' }))).rejects.toThrow(
+      'There are no ledgers (.iou.json files) in Shared.',
+    );
+    const { app, folders, state } = makeFolderApp({ folder: new MemoryFolder('Mine'), key: 'browser' });
+    await folders.start();
+    state.choice = await filesFolder(pickedFiles({ 'Bad.iou.json': '{' }));
+    await folders.choose();
+    expect(app.dialog.value).toBe('folder');
+    expect(folders.setup.value).toEqual({
+      kind: 'failed',
+      message: 'None of the ledgers in Shared could be opened.',
+    });
   });
 });

@@ -44,6 +44,8 @@ export function Dialogs({ app, catalog }: { readonly app: AppController; readonl
 interface Entry extends MenuEntry {
   readonly keys: string;
   readonly enabled: boolean;
+  /** Why it's off, when the user should be told (a read-only folder). */
+  readonly why: string | null;
 }
 
 /** ⌘K: every command, recent ones first (PRD §10). */
@@ -61,12 +63,14 @@ function CommandMenu({ app, catalog }: { readonly app: AppController; readonly c
           keywords: `${c.keywords ?? ''} ${c.description}`,
           keys: catalog.keys(c).join(' '),
           enabled: catalog.isEnabled(c),
+          why: catalog.whyDisabled(c),
         })),
     [catalog],
   );
   const results = filterEntries(entries, query, catalog.recentIds).slice(0, 80);
   const pick = (i: number) => {
     const entry = results[i];
+    if (entry?.why) app.say(entry.why, { tone: 'error' });
     if (!entry?.enabled) return;
     app.close();
     // Let the menu close (and focus go back) before the command runs.
@@ -95,10 +99,12 @@ function CommandMenu({ app, catalog }: { readonly app: AppController; readonly c
           aria-selected={i === index}
           aria-disabled={!e.enabled}
           class={e.enabled ? undefined : 'iou-disabled'}
+          title={e.why ?? undefined}
           onPointerMove={() => setIndex(i)}
           onClick={() => pick(i)}
         >
           <span class="iou-palette-title">{e.title}</span>
+          {e.why && <span class="iou-palette-why">Read-only</span>}
           <span class="iou-palette-group">{e.group}</span>
           {e.keys && <kbd>{e.keys}</kbd>}
         </li>

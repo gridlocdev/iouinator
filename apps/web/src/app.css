@@ -74,6 +74,11 @@ button.iou-ledger-name:hover {
   margin: 0;
   color: var(--iou-text-3);
 }
+.iou-read-only-note {
+  margin: 0;
+  color: var(--iou-text-2);
+  font-size: 13px;
+}
 .iou-field-error {
   margin: 0;
   color: var(--iou-danger);

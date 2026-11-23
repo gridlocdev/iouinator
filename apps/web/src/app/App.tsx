@@ -60,7 +60,8 @@ function TopBar({
 
 /**
  * The status bar: the latest notice with its action, a failed save until a save works, and in the browser's
- * own storage the storage note (PRD §8.2, §8.3), and the live region for screen readers (PRD §14).
+ * own storage or a read-only folder the storage note (PRD §8.2, §8.3), and the live region for screen readers
+ * (PRD §14).
  */
 function StatusBar({
   app,
@@ -100,6 +101,11 @@ function StatusBar({
         )}
         {!notice && failed === null && !release && inBrowserStorage(current) && (
           <span class="iou-storage-note">Stored in this browser</span>
+        )}
+        {!notice && failed === null && !release && current?.folder.readOnly !== undefined && (
+          <span class="iou-storage-note" title={current.folder.readOnly}>
+            Read-only: {current.folder.label}
+          </span>
         )}
         {notice && (
           <>

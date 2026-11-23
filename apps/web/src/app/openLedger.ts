@@ -375,9 +375,11 @@ export class OpenLedger {
     await this.#openFirst(await this.#refreshNames());
   }
 
-  /** Opens the first of `names` that opens, or a new ledger. */
+  /** Opens the first of `names` that opens, or a new ledger; a read-only folder can't have one. */
   async #openFirst(names: readonly string[]): Promise<void> {
     for (const name of names) if (await this.open(name)) return;
+    if (this.folder.readOnly !== undefined)
+      throw new Error(`None of the ledgers in ${this.folder.label} could be opened.`);
     await this.newLedger();
   }
 

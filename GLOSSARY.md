@@ -44,6 +44,8 @@ IOUinator keeps track of who owes whom. These are the words it uses for its own 
 
 **Ledger folder**: The folder that holds the **ledger files**: Documents/IOUinator or one you choose on desktop, or the browser's own storage. _Avoid_: library, workspace
 
+**Read-only folder**: A **ledger folder** that Firefox or Safari opened with the file input: its **ledgers** can be read and exported but not changed. _Avoid_: locked, view-only
+
 **Trash**: Where a deleted **ledger** goes, `.iouinator/trash/` in the **ledger folder**, until **Open Trash…** restores it. _Avoid_: recycle bin
 
 **Conflict**: A **ledger file** that changed or was deleted elsewhere while the **ledger** had unsaved changes. IOUinator asks whether to save yours as a copy, keep yours or use theirs.

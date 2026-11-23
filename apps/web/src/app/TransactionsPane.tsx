@@ -11,7 +11,7 @@ export function TransactionsPane({ app }: { readonly app: AppController }) {
       <h2 id="iou-transactions-title" class="iou-pane-title">
         Transactions
       </h2>
-      {app.ledger.value.people.length < 2 ? (
+      {app.readOnly.value !== null ? null : app.ledger.value.people.length < 2 ? (
         <p class="iou-empty">Add at least two people to record a transaction.</p>
       ) : (
         <TransactionForm app={app} />

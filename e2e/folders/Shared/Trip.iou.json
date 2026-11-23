@@ -1,0 +1,9 @@
+{
+  "format": "iouinator",
+  "version": 1,
+  "people": [
+    { "id": "p1", "name": "Sam" },
+    { "id": "p2", "name": "Alex" }
+  ],
+  "transactions": [{ "id": "t1", "from": "p1", "to": "p2", "cents": 1250, "description": "Pizza" }]
+}

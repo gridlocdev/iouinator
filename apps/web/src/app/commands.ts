@@ -40,6 +40,7 @@ function ledgerCommands(app: AppController, folders: LedgerFolders): CommandSpec
   const specs: CommandSpec[] = [
     {
       id: 'file.new',
+      writes: true,
       title: 'New Ledger',
       description: 'Start a new ledger in the ledger folder.',
       group: 'File',
@@ -77,6 +78,7 @@ function ledgerCommands(app: AppController, folders: LedgerFolders): CommandSpec
   specs.push(
     {
       id: 'file.rename',
+      writes: true,
       title: 'Rename Ledger…',
       description: 'Give the open ledger another name.',
       group: 'File',
@@ -84,6 +86,7 @@ function ledgerCommands(app: AppController, folders: LedgerFolders): CommandSpec
     },
     {
       id: 'file.delete',
+      writes: true,
       title: 'Delete Ledger',
       description: 'Move the open ledger to the trash.',
       group: 'File',
@@ -106,6 +109,7 @@ function ledgerCommands(app: AppController, folders: LedgerFolders): CommandSpec
     },
     {
       id: 'file.trash',
+      writes: true,
       title: 'Open Trash…',
       description: 'See deleted ledgers and restore them.',
       group: 'File',
@@ -162,6 +166,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'edit.undo',
+      writes: true,
       title: 'Undo',
       description: 'Undo the last change to the ledger.',
       group: 'Edit',
@@ -171,6 +176,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'edit.redo',
+      writes: true,
       title: 'Redo',
       description: 'Redo the change you undid last.',
       group: 'Edit',
@@ -180,6 +186,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'person.add',
+      writes: true,
       title: 'Add Person',
       description: 'Type the name of someone to add to the ledger.',
       group: 'Edit',
@@ -189,6 +196,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'person.rename',
+      writes: true,
       title: 'Rename Person…',
       description: 'Give a person another name.',
       group: 'Edit',
@@ -209,6 +217,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'person.remove',
+      writes: true,
       title: 'Remove Person',
       description: 'Remove a person and every transaction they are in.',
       group: 'Edit',
@@ -220,6 +229,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'transaction.new',
+      writes: true,
       title: 'New Transaction',
       description: 'Type the amount of a new transaction.',
       group: 'Edit',
@@ -230,6 +240,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'transaction.edit',
+      writes: true,
       title: 'Edit Transaction…',
       description: 'Change the chosen transaction.',
       group: 'Edit',
@@ -240,6 +251,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'transaction.swap',
+      writes: true,
       title: 'Swap Direction',
       description: 'Turn who owes whom around in the chosen transaction.',
       group: 'Edit',
@@ -249,6 +261,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
     {
       id: 'transaction.delete',
+      writes: true,
       title: 'Delete Transaction',
       description: 'Remove the chosen transaction.',
       group: 'Edit',
@@ -336,6 +349,7 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
     },
   ];
   const catalog = new CommandCatalog(specs);
+  catalog.readOnly = () => app.readOnly.value;
   catalog.gate = (c) => {
     if (folders !== undefined && folders.current.value === null) return false;
     const open = app.dialog.value;

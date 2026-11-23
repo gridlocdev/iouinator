@@ -22,7 +22,7 @@ just run-web       # the browser version on http://localhost:5173
 
 The desktop app asks where to keep your ledgers: **Use Documents/IOUinator**, or **Choose Folder…** for another folder. **⌘O** (**Ctrl+O**) picks another folder later. An empty folder gets a new ledger called Ledger.
 
-The browser keeps ledgers in its own storage, and the status bar says "Stored in this browser". In Chrome and Edge, **Open Ledger Folder…** in the command menu (**⌘K**) keeps them in a folder on disk instead.
+The browser keeps ledgers in its own storage, and the status bar says "Stored in this browser". In Chrome and Edge, **Open Ledger Folder…** in the command menu (**⌘K**) keeps them in a folder on disk instead. In Firefox and Safari it opens a folder only to read its ledgers, and you pick it again on each visit; **Keep Ledgers in This Browser** goes back to editing.
 
 ## A first ledger
 

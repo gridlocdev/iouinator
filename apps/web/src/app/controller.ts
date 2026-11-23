@@ -79,6 +79,8 @@ export class AppController {
   readonly menu = signal<ContextMenu | null>(null);
   /** True while the transaction list has the keyboard: Enter, Delete and the arrows act on it (PRD §4.3). */
   readonly listFocused = signal(false);
+  /** Why the ledger can't be changed (a folder Firefox or Safari opened), or null (PRD §8.2). */
+  readonly readOnly = signal<string | null>(null);
   readonly #notices = new Notices();
   readonly notice = this.#notices.notice;
   /** What the screen reader's live region says (PRD §14). */
@@ -234,6 +236,7 @@ export class AppController {
   }
 
   step(step: 'undo' | 'redo'): void {
+    if (this.#refused()) return;
     const ledger = step === 'undo' ? this.#undo.undo(this.ledger.value) : this.#undo.redo(this.ledger.value);
     if (!ledger) return;
     this.#show(ledger);
@@ -263,6 +266,13 @@ export class AppController {
     };
   }
 
+  /** True, after saying why, when the ledger can't be changed. */
+  #refused(): boolean {
+    const why = this.readOnly.value;
+    if (why !== null) this.say(why, { tone: 'error' });
+    return why !== null;
+  }
+
   /** A person's name, or `someone` for an id that isn't there. */
   name(id: string): string {
     return personById(this.ledger.value, id)?.name ?? 'someone';
@@ -272,6 +282,7 @@ export class AppController {
 
   /** Adds a person; returns an error to show by the field, or null when added. */
   addPerson(name: string): string | null {
+    if (this.readOnly.value !== null) return this.readOnly.value;
     const edit = addPerson(this.ledger.value, name);
     if ('error' in edit) return edit.error;
     this.editLedger(edit.ledger);
@@ -281,6 +292,7 @@ export class AppController {
 
   /** Renames a person; returns an error to show, or null when done. The same name changes nothing. */
   renamePerson(id: string, name: string): string | null {
+    if (this.readOnly.value !== null) return this.readOnly.value;
     const before = this.name(id);
     const edit = renamePerson(this.ledger.value, id, name);
     if ('error' in edit) return edit.error;
@@ -292,6 +304,7 @@ export class AppController {
 
   /** Removes a person and their transactions; the notice's Undo brings them back (PRD §3). */
   removePerson(id: string): void {
+    if (this.#refused()) return;
     const name = this.name(id);
     const edit = removePerson(this.ledger.value, id);
     if ('error' in edit) return this.say(edit.error, { tone: 'error' });
@@ -307,6 +320,7 @@ export class AppController {
   }
 
   startRenamePerson(id: string): void {
+    if (this.#refused()) return;
     this.renaming.value = id;
     this.open('renamePerson');
   }
@@ -315,6 +329,7 @@ export class AppController {
 
   /** Adds a transaction; returns an error to show, or null when added. */
   addTransaction(fields: TransactionFields): string | null {
+    if (this.readOnly.value !== null) return this.readOnly.value;
     const edit = addTransaction(this.ledger.value, fields);
     if ('error' in edit) return edit.error;
     batch(() => {
@@ -327,6 +342,7 @@ export class AppController {
 
   /** Saves Edit Transaction…; returns an error to show, or null when done. No change records nothing. */
   updateTransaction(id: string, fields: TransactionFields): string | null {
+    if (this.readOnly.value !== null) return this.readOnly.value;
     const edit = updateTransaction(this.ledger.value, id, fields);
     if ('error' in edit) return edit.error;
     this.editLedger(edit.ledger);
@@ -334,6 +350,7 @@ export class AppController {
   }
 
   startEdit(t: Transaction): void {
+    if (this.#refused()) return;
     batch(() => {
       this.chosen.value = t.id;
       this.editing.value = t.id;
@@ -342,12 +359,14 @@ export class AppController {
   }
 
   swap(t: Transaction): void {
+    if (this.#refused()) return;
     this.editLedger(swapTransaction(this.ledger.value, t.id));
     this.#announce(`Now ${this.name(t.to)} owes ${this.name(t.from)}.`);
   }
 
   /** Deletes a transaction; the chosen row moves to the next one. The notice's Undo brings it back. */
   deleteTransaction(t: Transaction): void {
+    if (this.#refused()) return;
     const list = this.visible.value;
     const at = list.findIndex((x) => x.id === t.id);
     const after = deleteTransaction(this.ledger.value, t.id);

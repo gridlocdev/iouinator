@@ -24,7 +24,7 @@ The Diagram pane draws each person as a box and each debt as an arrow from the p
 
 ## Ledger files
 
-Each ledger is one JSON file, `Name.iou.json`, saved a moment after every change. The desktop app keeps them in a folder you choose (Documents/IOUinator by default); the browser keeps them in its own storage. Click the ledger's name to open another one, or use the **File** menu to make, rename, delete or export one. Deleted ledgers go to the trash, where they can be restored. If the file changes somewhere else while it is open, IOUinator takes the change when nothing is unsaved, or asks which to keep. A file from a newer IOUinator, or a damaged one, is never opened or written over.
+Each ledger is one JSON file, `Name.iou.json`, saved a moment after every change. The desktop app keeps them in a folder you choose (Documents/IOUinator by default); the browser keeps them in its own storage, or in a folder on disk in Chrome and Edge. Firefox and Safari can open a folder only to read it: its ledgers show with their diagram and can be exported, but nothing in them can change, and the browser's own storage stays the place to edit. Click the ledger's name to open another one, or use the **File** menu to make, rename, delete or export one. Deleted ledgers go to the trash, where they can be restored. If the file changes somewhere else while it is open, IOUinator takes the change when nothing is unsaved, or asks which to keep. A file from a newer IOUinator, or a damaged one, is never opened or written over.
 
 ## Commands and shortcuts
 

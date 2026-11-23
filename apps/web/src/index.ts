@@ -27,6 +27,7 @@ export {
   LedgerFolders,
   browserPlatform,
   desktopPlatform,
+  filesFolder,
   inBrowserStorage,
   type FolderPlatform,
   type FolderSetup,

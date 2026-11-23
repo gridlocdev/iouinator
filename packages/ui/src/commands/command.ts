@@ -36,6 +36,8 @@ export interface CommandSpec {
   readonly global?: boolean;
   /** Its shortcuts work from the keyboard but don't go in the menu bar (Enter, Escape, arrows). */
   readonly keysOnly?: boolean;
+  /** It changes the ledger or the folder, so it is off while the catalog's `readOnly` gives a reason. */
+  readonly writes?: boolean;
 }
 
 export interface Command extends CommandSpec {
@@ -85,8 +87,17 @@ export class CommandCatalog {
     return this.#byId.get(id);
   }
 
+  /** Why nothing can be changed now (a read-only folder), or null; commands that write are off meanwhile. */
+  readOnly: (() => string | null) | null = null;
+
   isEnabled(c: Command): boolean {
+    if (this.whyDisabled(c) !== null) return false;
     return c.enabled?.() ?? true;
+  }
+
+  /** The reason a command is off that the user should be told, or null. */
+  whyDisabled(c: Command): string | null {
+    return c.writes ? (this.readOnly?.() ?? null) : null;
   }
 
   /** Runs `id` if it is enabled and the gate lets it. */

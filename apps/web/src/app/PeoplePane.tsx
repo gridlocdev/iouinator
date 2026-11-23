@@ -19,39 +19,44 @@ export function PeoplePane({ app }: { readonly app: AppController }) {
   const people = app.ledger.value.people;
   const balances = app.balances.value;
   const filter = app.filter.value;
+  const readOnly = app.readOnly.value;
   return (
     <section class="iou-pane iou-people" aria-labelledby="iou-people-title">
       <h2 id="iou-people-title" class="iou-pane-title">
         People
       </h2>
-      <form
-        class="iou-add-person"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const problem = app.addPerson(name);
-          setError(problem);
-          if (problem === null) setName('');
-        }}
-      >
-        <input
-          ref={input}
-          type="text"
-          autoComplete="off"
-          placeholder="Add a person"
-          aria-label="Name of a person to add"
-          maxLength={MAX_NAME + 20}
-          value={name}
-          aria-invalid={error !== null}
-          aria-describedby={error ? 'iou-person-error' : undefined}
-          onInput={(e) => {
-            setName(e.currentTarget.value);
-            setError(null);
+      {readOnly !== null ? (
+        <p class="iou-read-only-note">{readOnly}</p>
+      ) : (
+        <form
+          class="iou-add-person"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const problem = app.addPerson(name);
+            setError(problem);
+            if (problem === null) setName('');
           }}
-        />
-        <button type="submit" class="iou-button">
-          Add
-        </button>
-      </form>
+        >
+          <input
+            ref={input}
+            type="text"
+            autoComplete="off"
+            placeholder="Add a person"
+            aria-label="Name of a person to add"
+            maxLength={MAX_NAME + 20}
+            value={name}
+            aria-invalid={error !== null}
+            aria-describedby={error ? 'iou-person-error' : undefined}
+            onInput={(e) => {
+              setName(e.currentTarget.value);
+              setError(null);
+            }}
+          />
+          <button type="submit" class="iou-button">
+            Add
+          </button>
+        </form>
+      )}
       {error && (
         <p id="iou-person-error" class="iou-field-error" role="alert">
           {error}

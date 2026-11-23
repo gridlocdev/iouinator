@@ -72,6 +72,7 @@ function OpenMenu({
             role="menuitem"
             class={`iou-context-item${c.danger ? ' iou-danger' : ''}`}
             disabled={!catalog.isEnabled(c)}
+            title={catalog.whyDisabled(c) ?? undefined}
             onPointerDown={(e) => e.preventDefault()}
             onClick={() => catalog.run(id)}
           >

@@ -14,7 +14,9 @@ import {
   test,
   totals,
   transactionList,
+  waitForApp,
 } from './fixtures.ts';
+import { fileURLToPath } from 'node:url';
 import type { Page } from '@playwright/test';
 
 const person = (page: Page, name: string) =>
@@ -234,6 +236,50 @@ test.describe('Ledger files', () => {
     await runCommand(page, 'New Ledger');
     await expect(page.getByRole('button', { name: /^Ledger: Ledger 2\./ })).toBeVisible();
     await expect(peoplePane(page)).toContainText('No one yet.');
+  });
+
+  test('opens a folder read-only where the browser has no folder picker (Firefox, Safari)', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, 'showDirectoryPicker', { value: undefined });
+    });
+    await page.reload();
+    await waitForApp(page);
+    const chooser = page.waitForEvent('filechooser');
+    await runCommand(page, 'Open Ledger Folder');
+    await (await chooser).setFiles(fileURLToPath(new URL('folders/Shared', import.meta.url)));
+
+    await expect(page.getByRole('button', { name: /^Ledger: Trip\./ })).toBeVisible();
+    await expect(row(page, 'Sam owes Alex $12.50 for Pizza')).toBeVisible();
+    await expect(notice(page)).toContainText('Read-only: Shared');
+    await expect(peoplePane(page)).toContainText('only to read it');
+    await expect(personField(page)).toBeHidden();
+    await expect(page.getByRole('form', { name: 'New transaction' })).toHaveCount(0);
+
+    // Commands that write are off, and say why.
+    await page.keyboard.press('ControlOrMeta+KeyK');
+    await page.keyboard.type('New Ledger');
+    const entry = page.getByRole('option', { name: /New Ledger/ });
+    await expect(entry).toHaveAttribute('aria-disabled', 'true');
+    await expect(entry).toContainText('Read-only');
+    await page.keyboard.press('Enter');
+    await expect(notice(page)).toContainText('only to read it');
+    await page.keyboard.press('Escape');
+    await row(page, 'Sam owes Alex $12.50 for Pizza').dblclick();
+    await expect(page.getByRole('dialog', { name: 'Edit Transaction' })).toHaveCount(0);
+
+    // Reading still works: the diagram flattens and the ledger exports.
+    await pressKey(page, 'f');
+    await expect(totals(page)).toContainText('$12.50');
+    const download = page.waitForEvent('download');
+    await runCommand(page, 'Export Ledger');
+    expect((await download).suggestedFilename()).toBe('Trip.iou.json');
+
+    // The browser's own storage was left alone and is editable again.
+    await runCommand(page, 'Keep Ledgers in This Browser');
+    await expect(page.getByRole('button', { name: /^Ledger: Ledger\./ })).toBeVisible();
+    await addPeople(page, 'Kim');
   });
 });
 

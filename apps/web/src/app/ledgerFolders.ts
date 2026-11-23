@@ -9,9 +9,13 @@ import {
   after,
   allowFolder,
   browserFolder,
+  FileListFolder,
+  LedgerLibrary,
   canPickFolder,
+  canPickFolderFiles,
   forgetPickedFolder,
   pickFolder,
+  pickFolderFiles,
   pickedFolder,
   type Folder,
   type LedgerKeep,
@@ -45,6 +49,11 @@ export interface FolderPlatform {
   readonly canChoose: boolean;
   /** Asks the user for a folder; null when they cancel. */
   choose(): Promise<OpenedFolder | null>;
+  /**
+   * True when the open folder can change while the picker is open (the desktop app moves to the new folder as
+   * it closes), so the open ledger is set aside until the pick ends.
+   */
+  readonly pickMovesFolder: boolean;
   /** The folder dialog's first answer: Documents/IOUinator, or the browser's own storage. */
   readonly defaultTitle: string;
   /** `remember`: the browser forgets a folder it picked, so the next visit starts in its own storage too. */
@@ -100,8 +109,9 @@ export class LedgerFolders {
       await old.flush();
       old.snapshot();
     }
-    // Nothing is saved or checked while the picker is open: on desktop, the folder changes as it closes.
-    this.current.value = null;
+    // Nothing is saved or checked while the picker is open: on desktop, the folder changes as it closes. The
+    // browser's pickers leave the open folder alone, and Firefox's may never say it was cancelled.
+    if (this.platform.pickMovesFolder) this.current.value = null;
     let picked: OpenedFolder | null = null;
     try {
       picked = await this.platform.choose();
@@ -109,8 +119,10 @@ export class LedgerFolders {
       this.#app.say(`Couldn’t open the folder: ${message(e)}`, { tone: 'error' });
     }
     if (picked) await this.#use(picked, old);
-    else if (old) this.current.value = old;
-    else this.#ask(setup ?? { kind: 'first' });
+    else if (old) {
+      this.current.value = old;
+      this.#app.readOnly.value = old.folder.readOnly ?? null;
+    } else this.#ask(setup ?? { kind: 'first' });
   }
 
   /** The folder dialog's first answer. */
@@ -153,6 +165,7 @@ export class LedgerFolders {
     }
     this.setup.value = null;
     if (this.#app.dialog.peek() === 'folder') this.#app.close();
+    this.#app.readOnly.value = null;
     const current = new OpenLedger({
       ...this.#options,
       app: this.#app,
@@ -169,6 +182,7 @@ export class LedgerFolders {
       return;
     }
     this.current.value = current;
+    this.#app.readOnly.value = opened.folder.readOnly ?? null;
   }
 }
 
@@ -187,6 +201,7 @@ export function desktopPlatform(native: IOUinatorNative): FolderPlatform {
       return info.missing ? { kind: 'missing', folder: info.folder } : opened(info.folder);
     },
     canChoose: true,
+    pickMovesFolder: true,
     async choose() {
       const path = await native.chooseFolder();
       return path === null ? null : opened(path);
@@ -204,7 +219,25 @@ export function desktopPlatform(native: IOUinatorNative): FolderPlatform {
 /** The key of the browser's own storage. */
 export const BROWSER_KEY = 'browser';
 
-/** The browser's folders: one the user picked, where the browser can, or its own storage. */
+/** What Open Ledger Folder… says in a browser that can't open a folder at all. */
+export const NO_FOLDER_PICKER =
+  'This browser can’t open a folder. The IOUinator desktop app keeps ledgers in a folder on your computer.';
+
+/**
+ * A folder picked with the file input, read-only (PRD §8.2). One with no ledgers is refused, as nothing could
+ * be made in it.
+ */
+export async function filesFolder(files: readonly File[]): Promise<OpenedFolder> {
+  const folder = new FileListFolder(files);
+  if ((await new LedgerLibrary(folder).names()).length === 0)
+    throw new Error(`There are no ledgers (.iou.json files) in ${folder.label}.`);
+  return { folder, key: `files:${folder.label}` };
+}
+
+/**
+ * The browser's folders: one the user picked, where the browser can (read-only in Firefox and Safari), or its
+ * own storage.
+ */
 export function browserPlatform(): FolderPlatform {
   let remembered: FileSystemDirectoryHandle | null = null;
   const picked = (folder: Folder): OpenedFolder => ({ folder, key: `picked:${folder.label}` });
@@ -218,13 +251,20 @@ export function browserPlatform(): FolderPlatform {
       }
       return { folder: await browserFolder(), key: BROWSER_KEY };
     },
-    canChoose: canPickFolder(),
+    // Where the browser can't open a folder, Open Ledger Folder… says so.
+    canChoose: true,
+    pickMovesFolder: false,
     async choose() {
-      const folder = await pickFolder();
-      return folder ? picked(folder) : null;
+      if (canPickFolder()) {
+        const folder = await pickFolder();
+        return folder ? picked(folder) : null;
+      }
+      if (!canPickFolderFiles()) throw new Error(NO_FOLDER_PICKER);
+      const files = await pickFolderFiles();
+      return files ? filesFolder(files) : null;
     },
     defaultTitle: 'Keep Ledgers in This Browser',
-    offersDefault: canPickFolder(),
+    offersDefault: canPickFolder() || canPickFolderFiles(),
     exportLedger: (name, text) => {
       download(`${name}.iou.json`, text);
       return Promise.resolve(true);

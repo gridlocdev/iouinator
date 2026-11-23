@@ -87,6 +87,7 @@ export function memoryPlatform(first: OpenedFolder | FolderSetup = { kind: 'firs
   const platform: FolderPlatform = {
     first: () => Promise.resolve(first),
     canChoose: true,
+    pickMovesFolder: true,
     choose: () => Promise.resolve(state.choice),
     defaultTitle: 'Use Documents/IOUinator',
     offersDefault: true,

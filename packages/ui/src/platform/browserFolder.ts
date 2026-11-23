@@ -1,6 +1,7 @@
 /**
- * The browser's ledger folders (PRD §8.2): a folder the user picked with the File System Access API, or the
- * browser's own storage (the origin private file system), or memory where a browser has neither.
+ * The browser's ledger folders (PRD §8.2): a folder the user picked with the File System Access API, a
+ * read-only snapshot of one picked with the file input (Firefox, Safari), or the browser's own storage (the
+ * origin private file system), or memory where a browser has neither.
  */
 import { HandleFolder } from './handleFolder.ts';
 import { MemoryFolder } from './memoryFolder.ts';
@@ -25,6 +26,34 @@ interface PickerWindow {
 /** True where the browser can open a folder on disk (Chromium browsers). */
 export function canPickFolder(): boolean {
   return typeof (globalThis as PickerWindow).showDirectoryPicker === 'function';
+}
+
+/** True where the browser can pick a folder with `<input webkitdirectory>`, only to read it (Firefox, Safari). */
+export function canPickFolderFiles(): boolean {
+  return typeof HTMLInputElement !== 'undefined' && 'webkitdirectory' in HTMLInputElement.prototype;
+}
+
+/**
+ * Picks a folder with a hidden `<input type="file" webkitdirectory>`, from the user's click. Gives every file
+ * under it, or null when the user cancelled. A browser that never fires `cancel` leaves the promise pending,
+ * which blocks nothing.
+ */
+export function pickFolderFiles(doc: Document = document): Promise<File[] | null> {
+  return new Promise((resolve) => {
+    const input = doc.createElement('input');
+    input.type = 'file';
+    input.webkitdirectory = true;
+    input.multiple = true;
+    input.hidden = true;
+    const done = (files: File[] | null) => {
+      input.remove();
+      resolve(files);
+    };
+    input.addEventListener('change', () => done(input.files ? [...input.files] : null), { once: true });
+    input.addEventListener('cancel', () => done(null), { once: true });
+    doc.body.append(input);
+    input.click();
+  });
 }
 
 /** The browser's own storage, or memory where there is none (a private window in some browsers). */

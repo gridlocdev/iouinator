@@ -38,7 +38,7 @@ IOUinator is one TypeScript code base with two hosts. The browser and the Electr
 
 - `commands/`: the `CommandCatalog`. Shortcuts are parsed once; `listenForKeys` is the one key listener.
 - `settings.ts`: the per-device settings and where they are kept (PRD §11).
-- `platform/`: `Folder`, the one way the app reaches files, with versions (SHA-256 of the bytes) and conflicts; its adapters for the browser's own storage, a folder picked with the File System Access API, memory and the desktop app's bridge; and `LedgerLibrary`, the ledgers and trash in a folder (PRD §8).
+- `platform/`: `Folder`, the one way the app reaches files, with versions (SHA-256 of the bytes) and conflicts; its adapters for the browser's own storage, a folder picked with the File System Access API, a read-only snapshot of a folder picked with `<input webkitdirectory>` in Firefox and Safari (`fileListFolder.ts`; `Folder.readOnly` says why, and the catalog turns off every command marked `writes`), memory and the desktop app's bridge; and `LedgerLibrary`, the ledgers and trash in a folder (PRD §8).
 - `components/`: `Dialog` (focus trap, Escape, one at a time), `ListPopup` for ⌘K, `Icon`, and `domHooks.ts`, which keeps focus, scrolling, popup placement and the drawn diagram in step with the model.
 - `schedule.ts`: the page's only timers.
 
