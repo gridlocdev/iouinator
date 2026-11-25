@@ -147,6 +147,46 @@ export function matchRank(s: Shortcut, e: ShortcutEvent, mac = isMac): number {
   return (NAMES[k] ?? k) === s.key && e.shiftKey === s.shift ? 1 : 0;
 }
 
+const MODIFIER_KEYS = new Set([
+  'Shift',
+  'Meta',
+  'Control',
+  'Alt',
+  'AltGraph',
+  'CapsLock',
+  'Fn',
+  'OS',
+  'Hyper',
+  'Super',
+]);
+
+/**
+ * The shortcut a key event pressed, written the way the catalog writes its own (`mod+shift+]` for ⇧⌘}), or
+ * null for a modifier on its own. For showing what was pressed; matching goes through `matchRank`.
+ */
+export function shortcutOfEvent(e: ShortcutEvent, mac = isMac): Shortcut | null {
+  if (MODIFIER_KEYS.has(e.key) || e.key === 'Dead' || e.key === 'Unidentified') return null;
+  let key: string;
+  if (/^[\x21-\x7e]$/.test(e.key)) {
+    const ch = e.key.toLowerCase();
+    key = e.shiftKey ? (UNSHIFTED[ch] ?? ch) : ch;
+  } else if ([...e.key].length === 1 && e.key !== ' ') {
+    if (/^Key[A-Z]$/.test(e.code)) key = e.code.slice(3).toLowerCase();
+    else if (/^Digit\d$/.test(e.code)) key = e.code.slice(5);
+    else key = PUNCTUATION[e.code] ?? e.key;
+  } else {
+    const k = e.key.toLowerCase();
+    key = NAMES[k] ?? k;
+  }
+  return {
+    key,
+    mod: mac ? e.metaKey : e.ctrlKey,
+    shift: e.shiftKey,
+    alt: e.altKey,
+    ctrl: mac ? e.ctrlKey : false,
+  };
+}
+
 export function matches(s: Shortcut, e: ShortcutEvent, mac = isMac): boolean {
   return matchRank(s, e, mac) > 0;
 }

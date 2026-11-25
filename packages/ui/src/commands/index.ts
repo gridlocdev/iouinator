@@ -7,6 +7,7 @@ export {
   type CommandGroup,
   type CommandSpec,
   type KeyFocus,
+  type KeyMeaning,
   type KeyResult,
   type MenuEntry,
   type NativeMenuItem,
@@ -23,9 +24,10 @@ export {
   parseSequence,
   parseShortcut,
   sequenceAccelerator,
+  shortcutOfEvent,
   toAccelerator,
   type KeySequence,
   type Shortcut,
   type ShortcutEvent,
 } from './shortcut.ts';
-export { keyFocus, listenForKeys } from './keys.ts';
+export { captureKeys, keyFocus, listenForKeys } from './keys.ts';

@@ -4,6 +4,7 @@
  */
 import type { RefObject } from 'preact';
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
+import { captureKeys } from '../commands/keys.ts';
 
 /** Focuses the element each time `when` turns true, before the next key can land anywhere else. */
 export function useFocusWhen(ref: RefObject<HTMLElement | null>, when: boolean): void {
@@ -115,4 +116,17 @@ export function usePopupPlace(
     });
   }, [ref, point.x, point.y]);
   return at;
+}
+
+/**
+ * While `on`, every key press but Escape goes to `onKey` before the app sees it (`captureKeys`). Taken before the
+ * browser paints, so the first key after turning it on is caught; given back when `on` turns false, when the
+ * component goes, on Escape and if `onKey` throws (the last two call `onEnd`).
+ */
+export function useKeyCapture(
+  on: boolean,
+  onKey: (e: KeyboardEvent) => void,
+  onEnd: (escape: KeyboardEvent | null) => void,
+): void {
+  useLayoutEffect(() => (on ? captureKeys(window, onKey, onEnd) : undefined), [on]);
 }

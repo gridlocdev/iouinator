@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { menuSender, nativeMenu, shortcutGroups } from '../src/index.ts';
+import { describeKeyPress, menuSender, nativeMenu, shortcutGroups } from '../src/index.ts';
 import { makeApp, owe, people } from './helpers.ts';
 
 describe('commands', () => {
@@ -75,5 +75,32 @@ describe('commands', () => {
     );
     expect(lines).toContain('Flatten Debts F');
     expect(lines).toContain('Settings ⌘,');
+  });
+
+  it('"press a shortcut" names the command a key runs, from the same catalog', () => {
+    const { app, catalog } = makeApp();
+    const k = (key: string, more: { metaKey?: boolean; ctrlKey?: boolean; shiftKey?: boolean } = {}) => ({
+      key,
+      code: '',
+      metaKey: false,
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      ...more,
+    });
+    expect(describeKeyPress(catalog, k('f'), true)).toEqual({ keys: 'F', says: 'Flatten Debts', note: null });
+    expect(describeKeyPress(catalog, k('k', { metaKey: true }), true)?.says).toBe('Command Menu');
+    expect(describeKeyPress(catalog, k('j', { ctrlKey: true }), false)).toEqual({
+      keys: 'Ctrl+J',
+      says: 'No command',
+      note: null,
+    });
+    expect(describeKeyPress(catalog, k('Escape'), true)).toEqual({
+      keys: '⎋',
+      says: 'Clear Filter',
+      note: 'Not available right now.',
+    });
+    expect(describeKeyPress(catalog, k('Meta', { metaKey: true }), true)).toBe(null);
+    expect(app.dialog.value).toBe(null);
   });
 });

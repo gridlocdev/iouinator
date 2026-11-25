@@ -50,6 +50,12 @@ export type KeyFocus = 'text' | 'control' | 'list';
 export type KeyResult =
   { readonly kind: 'run'; readonly command: Command } | { readonly kind: 'wait' } | null;
 
+/** What a key would do (`CommandCatalog.meaningOf`): the command it runs, and the sequences it starts. */
+export interface KeyMeaning {
+  readonly command: Command | null;
+  readonly starts: readonly Command[];
+}
+
 /** One entry in the command menu: a command, or something made on the fly. */
 export interface MenuEntry {
   readonly id: string;
@@ -174,6 +180,36 @@ export class CommandCatalog {
           }
         }
     return null;
+  }
+
+  /**
+   * What a key press would do, for the Keyboard Shortcuts window's "press a shortcut" mode: the command whose
+   * one-key shortcut it is (enabled or not, an enabled one first), and the commands it is the first key of.
+   * Changes nothing: no command runs and no sequence starts.
+   */
+  meaningOf(e: ShortcutEvent, mac = isMac): KeyMeaning {
+    let command: Command | null = null;
+    let bestRank = Infinity;
+    const starts: Command[] = [];
+    for (const c of this.all)
+      for (const seq of c.sequences) {
+        const [first] = seq;
+        if (!first) continue;
+        const rank = matchRank(first, e, mac);
+        if (rank === 0) continue;
+        if (seq.length === 2) {
+          if (!starts.includes(c)) starts.push(c);
+          continue;
+        }
+        const better =
+          rank < bestRank ||
+          (rank === bestRank && command !== null && !this.isEnabled(command) && this.isEnabled(c));
+        if (better) {
+          command = c;
+          bestRank = rank;
+        }
+      }
+    return { command, starts };
   }
 
   /** Disabled commands let their keys through, so two commands can share a key . */

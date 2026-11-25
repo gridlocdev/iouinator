@@ -421,6 +421,19 @@ kbd {
 }
 
 /* Keyboard Shortcuts */
+.iou-press {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.iou-press-says {
+  margin: 0;
+  min-height: 1.5em;
+}
+.iou-press-note {
+  color: var(--iou-text-2);
+}
 .iou-shortcuts {
   columns: 2 260px;
   column-gap: 28px;

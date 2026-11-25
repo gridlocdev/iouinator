@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'preact/hooks';
+import { useMemo, useRef, useState } from 'preact/hooks';
 import { amountText, personById } from '@iouinator/core';
 import {
   Dialog,
@@ -7,13 +7,14 @@ import {
   VIEWS,
   filterEntries,
   isMac,
+  useKeyCapture,
   type CommandCatalog,
   type MenuEntry,
   type Theme,
   type View,
 } from '@iouinator/ui';
 import type { AppController } from './controller.ts';
-import { shortcutGroups } from './shortcuts.ts';
+import { describeKeyPress, shortcutGroups, type KeyPress } from './shortcuts.ts';
 import { TransactionFields, useTransactionDraft } from './TransactionFields.tsx';
 
 /** The open dialog, if any; one at a time. */
@@ -122,17 +123,59 @@ function ShortcutsDialog({
   readonly catalog: CommandCatalog;
 }) {
   const groups = shortcutGroups(catalog, isMac);
+  const [pressing, setPressing] = useState(false);
+  const [heard, setHeard] = useState<KeyPress | null>(null);
+  const endedBy = useRef<KeyboardEvent | null>(null);
+  useKeyCapture(
+    pressing,
+    (e) => {
+      const press = describeKeyPress(catalog, e, isMac);
+      if (press) setHeard(press);
+    },
+    (escape) => {
+      endedBy.current = escape;
+      setPressing(false);
+    },
+  );
   return (
     <Dialog
       title="Keyboard Shortcuts"
       class="iou-dialog-wide"
-      onClose={() => app.close()}
+      // The Escape that ended "press a shortcut" (which never takes it) goes on here, and shouldn't also close.
+      onClose={() => {
+        if ((endedBy.current?.eventPhase ?? Event.NONE) === Event.NONE) app.close();
+      }}
       actions={
         <button type="button" class="iou-button iou-button-primary" onClick={() => app.close()}>
           Close
         </button>
       }
     >
+      <div class="iou-press">
+        <button
+          type="button"
+          class="iou-button"
+          aria-pressed={pressing}
+          onClick={() => {
+            setHeard(null);
+            setPressing(!pressing);
+          }}
+        >
+          {pressing ? 'Stop' : 'Press a Shortcut…'}
+        </button>
+        <p class="iou-press-says" role="status">
+          {!pressing ? (
+            'See what a key does.'
+          ) : heard ? (
+            <>
+              <kbd>{heard.keys}</kbd> {heard.says}
+              {heard.note && <span class="iou-press-note"> {heard.note}</span>}
+            </>
+          ) : (
+            `Press any keys to see what they do. ${isMac ? '⎋' : 'Esc'} or Stop ends this.`
+          )}
+        </p>
+      </div>
       <div class="iou-shortcuts">
         {groups.map((g) => (
           <section key={g.title}>

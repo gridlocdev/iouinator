@@ -10,7 +10,7 @@ export { NOTICE_ACTION_MS, NOTICE_MS, type Notice } from './app/notices.ts';
 export { MENUS, buildCommands } from './app/commands.ts';
 export { MAX_UNDO, UndoStack } from './app/undo.ts';
 export { menuSender, nativeMenu } from './app/nativeMenu.ts';
-export { shortcutGroups, type ShortcutGroup, type ShortcutLine } from './app/shortcuts.ts';
+export { describeKeyPress, shortcutGroups, type ShortcutGroup, type ShortcutLine } from './app/shortcuts.ts';
 export { balanceText } from './app/PeoplePane.tsx';
 export { nextByLetter } from './app/PersonPicker.tsx';
 export { edgeKey } from './app/mermaidDraw.ts';

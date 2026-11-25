@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### What's new
+
+- **What does this key do?** The Keyboard Shortcuts window has a **Press a Shortcut…** button: press any keys and it names the command each one runs, without running it. Esc or Stop ends it.
+
 ### Improvements
 
 - **Locked-down desktop app.** The packaged app can no longer be started as plain Node or with Node's debugging options, and loads only its own bundled code.

@@ -296,6 +296,35 @@ test.describe('Commands and shortcuts', () => {
     await pressKey(page, 'n');
     await expect(page.getByRole('form', { name: 'New transaction' }).getByLabel('Amount')).toBeFocused();
   });
+
+  test('"press a shortcut" names what a key runs, and Escape or Stop always gives the keys back', async ({
+    page,
+  }) => {
+    await addPeople(page, 'Sam', 'Alex');
+    await pressKey(page, 'ControlOrMeta+Slash');
+    const shortcuts = page.getByRole('dialog', { name: 'Keyboard Shortcuts' });
+    const says = shortcuts.getByRole('status');
+    await shortcuts.getByRole('button', { name: 'Press a Shortcut…' }).click();
+    await page.keyboard.press('f');
+    await expect(says).toContainText('Flatten Debts');
+    await expect(page.getByRole('radio', { name: 'Raw' })).toBeChecked();
+    await page.keyboard.press('ControlOrMeta+j');
+    await expect(says).toContainText('No command');
+    await page.keyboard.press('ControlOrMeta+Slash');
+    await expect(says).toContainText('Keyboard Shortcuts');
+    await expect(shortcuts).toBeVisible();
+    // Escape leaves the mode and keeps the window open; the next Escape closes it as usual.
+    await page.keyboard.press('Escape');
+    await expect(says).toHaveText('See what a key does.');
+    await expect(shortcuts).toBeVisible();
+    await shortcuts.getByRole('button', { name: 'Press a Shortcut…' }).click();
+    await shortcuts.getByRole('button', { name: 'Stop' }).click();
+    await expect(says).toHaveText('See what a key does.');
+    await page.keyboard.press('Escape');
+    await expect(shortcuts).toBeHidden();
+    await pressKey(page, 'f');
+    await expect(page.getByRole('radio', { name: 'Flattened' })).toBeChecked();
+  });
 });
 
 test.describe('Settings and appearance', () => {

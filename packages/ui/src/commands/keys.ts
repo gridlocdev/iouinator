@@ -34,3 +34,45 @@ export function listenForKeys(target: Window, catalog: CommandCatalog, blocked: 
   target.addEventListener('keydown', onKey);
   return () => target.removeEventListener('keydown', onKey);
 }
+
+/**
+ * Takes every key press on `target` before the app sees it and hands it to `onKey`, for the Keyboard Shortcuts
+ * window's "press a shortcut" mode. Escape is never taken: it ends the capture and goes on to the app as usual.
+ * If `onKey` throws, the capture ends, so a bug can't leave every key swallowed. `onEnd` is called once when
+ * the capture ends by itself: with the Escape event, or null after an error. Returns a function that ends it, safe to call more than once.
+ */
+export function captureKeys(
+  target: EventTarget,
+  onKey: (e: KeyboardEvent) => void,
+  onEnd: (escape: KeyboardEvent | null) => void = () => {},
+): () => void {
+  const listening = new AbortController();
+  const stop = () => listening.abort();
+  const end = (escape: KeyboardEvent | null) => {
+    if (listening.signal.aborted) return;
+    stop();
+    onEnd(escape);
+  };
+  function listener(event: Event) {
+    const e = event as KeyboardEvent;
+    if (e.key === 'Escape') {
+      if (e.type === 'keydown') end(e);
+      return;
+    }
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (e.type !== 'keydown') return;
+    let handled = false;
+    try {
+      onKey(e);
+      handled = true;
+    } catch (error) {
+      console.error('Key capture failed, so it stopped', error);
+    } finally {
+      if (!handled) end(null);
+    }
+  }
+  for (const type of ['keydown', 'keyup', 'keypress'])
+    target.addEventListener(type, listener, { capture: true, signal: listening.signal });
+  return stop;
+}
