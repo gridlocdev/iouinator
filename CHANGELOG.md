@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Improvements
+
+- **Locked-down desktop app.** The packaged app can no longer be started as plain Node or with Node's debugging options, and loads only its own bundled code.
+
 ## 1.1.0
 
 ### What's new
