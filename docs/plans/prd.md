@@ -129,7 +129,7 @@ IOUinator keeps track of who owes whom among a group of people. You list the peo
 
 All commands are in one catalog, which feeds the keyboard, ⌘K, the menu bar, context menus, the Keyboard Shortcuts window (⌘/) and `docs/controls.md`.
 
-The Keyboard Shortcuts window lists every key by group. Its **Press a Shortcut…** button starts a mode where each key press shows what it runs, read from the same catalog ("⌘K Command Menu", "⌘J No command", with "Not available right now." for a command that is off); the key runs nothing meanwhile. Escape always ends the mode and is never taken (it doesn't also close the window), and so do the **Stop** button, closing the window and any error while handling a key.
+The Keyboard Shortcuts window lists every key by group. Its **Press a Shortcut…** button starts a mode where each key press shows what it runs, read from the same catalog ("⌘K Command Menu", "⌘J No command", with "Not available right now." for a command that is off); the key runs nothing meanwhile. Escape always ends the mode and is never taken (it doesn't also close the window), and so do the **Stop** button, closing the window, any error while handling a key, and 30 seconds with no key pressed.
 
 | Group | Command | Keys |
 | --- | --- | --- |

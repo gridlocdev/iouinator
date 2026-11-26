@@ -4,7 +4,7 @@
 
 ### What's new
 
-- **What does this key do?** The Keyboard Shortcuts window has a **Press a Shortcut…** button: press any keys and it names the command each one runs, without running it. Esc or Stop ends it.
+- **What does this key do?** The Keyboard Shortcuts window has a **Press a Shortcut…** button: press any keys and it names the command each one runs, without running it. Esc or Stop ends it, and so do 30 seconds with no key.
 
 ### Improvements
 

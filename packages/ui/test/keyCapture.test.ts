@@ -114,6 +114,42 @@ describe('capturing keys ("press a shortcut")', () => {
     expect(ran).toEqual(['clear', 'new']);
   });
 
+  it('gives the keyboard back after the idle time with no key, and each key starts the wait again', () => {
+    vi.useFakeTimers();
+    try {
+      const win = fakeWindow();
+      const { c, ran } = catalog();
+      const onEnd = vi.fn();
+      captureKeys(win, () => {}, onEnd, 1000);
+      listenForKeys(win as unknown as Window, c, () => false);
+      vi.advanceTimersByTime(900);
+      press(win, { key: 'n' });
+      vi.advanceTimersByTime(900);
+      expect(onEnd).not.toHaveBeenCalled();
+      expect(ran).toEqual([]);
+      vi.advanceTimersByTime(100);
+      expect(onEnd).toHaveBeenCalledExactlyOnceWith(null);
+      press(win, { key: 'n' });
+      expect(ran).toEqual(['new']);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('stopping cancels the idle wait', () => {
+    vi.useFakeTimers();
+    try {
+      const onEnd = vi.fn();
+      const stop = captureKeys(fakeWindow(), () => {}, onEnd, 1000);
+      stop();
+      vi.advanceTimersByTime(5000);
+      expect(onEnd).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('a handler that throws ends the capture, so keys reach the app again', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const win = fakeWindow();

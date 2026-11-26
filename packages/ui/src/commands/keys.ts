@@ -1,5 +1,9 @@
 /** The page's one keyboard listener: every key goes through the command catalog (PRD §10). */
+import { debounce } from '../schedule.ts';
 import type { CommandCatalog, KeyFocus } from './command.ts';
+
+/** How long "press a shortcut" waits for a key before it gives the keyboard back by itself. */
+export const CAPTURE_IDLE_MS = 30_000;
 
 /** Where keyboard focus is, for deciding which keys are commands. A list's own row counts as the list. */
 export function keyFocus(el: Element | null): KeyFocus {
@@ -38,16 +42,22 @@ export function listenForKeys(target: Window, catalog: CommandCatalog, blocked: 
 /**
  * Takes every key press on `target` before the app sees it and hands it to `onKey`, for the Keyboard Shortcuts
  * window's "press a shortcut" mode. Escape is never taken: it ends the capture and goes on to the app as usual.
- * If `onKey` throws, the capture ends, so a bug can't leave every key swallowed. `onEnd` is called once when
- * the capture ends by itself: with the Escape event, or null after an error. Returns a function that ends it, safe to call more than once.
+ * If `onKey` throws, the capture ends, so a bug can't leave every key swallowed, and so does `idleMs` with no key
+ * pressed, so a forgotten capture can't either. `onEnd` is called once when the capture ends by itself: with the
+ * Escape event, or null after an error or the idle time. Returns a function that ends it, safe to call more than once.
  */
 export function captureKeys(
   target: EventTarget,
   onKey: (e: KeyboardEvent) => void,
   onEnd: (escape: KeyboardEvent | null) => void = () => {},
+  idleMs = CAPTURE_IDLE_MS,
 ): () => void {
   const listening = new AbortController();
-  const stop = () => listening.abort();
+  const idle = debounce(idleMs, () => end(null));
+  const stop = () => {
+    idle.cancel();
+    listening.abort();
+  };
   const end = (escape: KeyboardEvent | null) => {
     if (listening.signal.aborted) return;
     stop();
@@ -62,6 +72,7 @@ export function captureKeys(
     e.preventDefault();
     e.stopImmediatePropagation();
     if (e.type !== 'keydown') return;
+    idle.call();
     let handled = false;
     try {
       onKey(e);
@@ -74,5 +85,6 @@ export function captureKeys(
   }
   for (const type of ['keydown', 'keyup', 'keypress'])
     target.addEventListener(type, listener, { capture: true, signal: listening.signal });
+  idle.call();
   return stop;
 }

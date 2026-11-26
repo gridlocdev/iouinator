@@ -28,7 +28,7 @@ Each ledger is one JSON file, `Name.iou.json`, saved a moment after every change
 
 ## Commands and shortcuts
 
-**⌘K** opens the command menu, which runs any command by name. **⌘/** opens the Keyboard Shortcuts window, built from the same list as the menus. Its **Press a Shortcut…** button shows what any key you press would run, without running it; **Esc** or **Stop** ends it.
+**⌘K** opens the command menu, which runs any command by name. **⌘/** opens the Keyboard Shortcuts window, built from the same list as the menus. Its **Press a Shortcut…** button shows what any key you press would run, without running it; **Esc** or **Stop** ends it, and so do 30 seconds with no key.
 
 ## Settings and appearance
 
