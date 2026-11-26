@@ -16,7 +16,7 @@ Download the desktop app for macOS, Windows or Linux from [Releases](https://git
 
 [Features](docs/features.md) · [Controls](docs/controls.md) · [Credits](docs/credits.md)
 
-[All docs](docs/README.md) · [Development](docs/development.md) · [Glossary](GLOSSARY.md)
+[All docs](docs/README.md) · [Development](docs/development.md)
 
 ## License
 
