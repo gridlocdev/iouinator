@@ -55,7 +55,7 @@ just package-desktop-dir  # an unpacked app only, faster
 just install-desktop      # macOS: package and copy to /Applications; the old copy goes to the Trash. If IOUinator is running, it asks to quit it and reopens it afterwards
 ```
 
-Packaging flips Electron's fuses before signing (`electronFuses` in `apps/desktop/electron-builder.yml`): the packaged app can't be run as plain Node (`ELECTRON_RUN_AS_NODE`), ignores `NODE_OPTIONS` and `--inspect`, encrypts its cookies, doesn't give `file://` pages extra rights, and loads its code only from `app.asar`, which it checks against the hash recorded when it was packaged. Check them with `npx @electron/fuses read --app apps/desktop/release/mac-arm64/IOUinator.app`.
+Packaging flips Electron's fuses before signing (`electronFuses` in `apps/desktop/electron-builder.yml`): the packaged app can't be run as plain Node (`ELECTRON_RUN_AS_NODE`), ignores `NODE_OPTIONS` and `--inspect`, doesn't give `file://` pages extra rights, and loads its code only from `app.asar`, which it checks against the hash recorded when it was packaged. Check them with `npx @electron/fuses read --app apps/desktop/release/mac-arm64/IOUinator.app`.
 
 The macOS app gets an ad-hoc signature and isn't notarized, so the first start needs **Open Anyway** in System Settings → Privacy & Security.
 

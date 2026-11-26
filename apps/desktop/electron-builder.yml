@@ -9,13 +9,13 @@ files:
   # The window icon on Linux and Windows (macOS takes the bundle's icon.icns).
   - build/icon.png
 asar: true
-# Electron's fuses, flipped before signing: no running as Node, no NODE_OPTIONS or --inspect, encrypted cookies,
-# and code loaded only from app.asar, checked against its hash. Pages come from app://, never file://.
+# Electron's fuses, flipped before signing: no running as Node, no NODE_OPTIONS or --inspect, and code loaded
+# only from app.asar, checked against its hash. Pages come from app://, never file://. Cookie encryption stays
+# off: on macOS it adds a Keychain item and can prompt.
 electronFuses:
   runAsNode: false
   enableNodeOptionsEnvironmentVariable: false
   enableNodeCliInspectArguments: false
-  enableCookieEncryption: true
   enableEmbeddedAsarIntegrityValidation: true
   onlyLoadAppFromAsar: true
   grantFileProtocolExtraPrivileges: false
