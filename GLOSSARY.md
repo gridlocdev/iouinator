@@ -28,7 +28,7 @@ IOUinator keeps track of who owes whom. These are the words it uses for its own 
 
 **Flattened view**: The diagram after **flattening**. **Flatten Debts** and the Raw / Flattened switch turn it on. `view: 'flat'` in the code. _Avoid_: simplified, optimised, settled view
 
-**Flattening**: Netting each pair of people, then cancelling **loops** by subtracting each loop's smallest debt from every debt in it. **Transactions** never change. _Avoid_: simplifying, settling up, optimising
+**Flattening**: Netting each pair of people, then cancelling **loops** by subtracting each loop's smallest debt from every debt in it. **Transactions** never change. Under the diagram, a line says what it saved: "3 debts → 1 · $30.00 less changing hands." _Avoid_: simplifying, settling up, optimising
 
 **Loop**: Debts that go round and come back: A owes B, B owes C, C owes A. _Avoid_: cycle (in the UI and docs; the code may say cycle)
 
@@ -50,7 +50,7 @@ IOUinator keeps track of who owes whom. These are the words it uses for its own 
 
 **Conflict**: A **ledger file** that changed or was deleted elsewhere while the **ledger** had unsaved changes. IOUinator asks whether to save yours as a copy, keep yours or use theirs.
 
-**Snapshot**: A copy of an unsaved **ledger** kept in the app's storage, offered for restoring on the next start. _Avoid_: backup, autosave file
+**Snapshot**: A copy of an unsaved **ledger** kept in the app's storage, offered for restoring on the next start ("Restore unsaved changes to …?", with **Restore** and **Discard**). _Avoid_: backup, autosave file, recovery file
 
 ### The app
 
@@ -58,9 +58,11 @@ IOUinator keeps track of who owes whom. These are the words it uses for its own 
 
 **Command menu**: The search box opened with **⌘K** that finds and runs a **command**. _Avoid_: command palette
 
-**Chosen transaction**: The one row of the transaction list that Enter, Delete and the context menu act on. `chosen` in the code. _Avoid_: selected, active, current
+**Keyboard Shortcuts window**: The list of every **command** and its keys, opened with **⌘/**. **Press a Shortcut…** lets you press keys to find out what they run, without running it. _Avoid_: cheat sheet, help
 
-**Status bar**: The strip at the bottom of the window with **notices** and the Settings button.
+**Chosen transaction**: The one row of the transaction list that Enter, Delete and the context menu act on. It is the list's one Tab stop, and the arrow keys move it. `chosen` in the code. _Avoid_: selected, active, current
+
+**Status bar**: The strip at the bottom of the window with **notices**, the storage note ("Stored in this browser", or that the **ledger folder** is read-only) and the Settings button.
 
 **Notice**: A short message in the **status bar**, sometimes with an action such as **Undo**. _Avoid_: toast, snackbar
 
