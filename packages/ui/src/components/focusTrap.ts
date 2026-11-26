@@ -1,6 +1,7 @@
 /** What Tab can land on inside a dialog. */
+/** Items with `tabindex="-1"` are skipped: in a radio row or a list only the current item is a stop. */
 const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  ':is(a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]):not([tabindex="-1"])';
 
 /**
  * Where Tab (or Shift+Tab, `backwards`) moves focus among `count` stops when it is on stop

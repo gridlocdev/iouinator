@@ -3,7 +3,7 @@
  * model (focus, a scroll position, a drawing, a popup's place); none copies one piece of state into another.
  */
 import type { RefObject } from 'preact';
-import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { captureKeys } from '../commands/keys.ts';
 
 /** Focuses the element each time `when` turns true, before the next key can land anywhere else. */
@@ -40,6 +40,32 @@ export function usePopupFocus(ref: RefObject<HTMLElement | null>, onClose: () =>
 export function useFocusRequest(ref: RefObject<HTMLElement | null>, request: number): void {
   useLayoutEffect(() => {
     if (request > 0) ref.current?.focus();
+  }, [ref, request]);
+}
+
+/** The one item of a list or a group that takes Tab: the current one (roving tabindex). */
+export const CURRENT_ITEM = '[tabindex="0"]';
+
+/**
+ * Keeps the keyboard on the current item of a list or a group, the one element inside `ref` with
+ * `tabindex="0"` (the rest have -1). The app's state picks that item; this moves focus after it. When the current
+ * item changes while focus is inside, or the focused item goes (a delete, an undo, a reload), focus moves to the
+ * new current item. `request` above 0, each time it changes, focuses it outright: a command asked for it.
+ */
+export function useRovingFocus(ref: RefObject<HTMLElement | null>, request = 0): void {
+  // Read while rendering, before this render can take the focused item away.
+  const had = useRef(false);
+  had.current = typeof document !== 'undefined' && (ref.current?.contains(document.activeElement) ?? false);
+  useLayoutEffect(() => {
+    const root = ref.current;
+    const now = document.activeElement;
+    const lost = now === null || now === document.body;
+    if (!root || !(root.contains(now) || (had.current && lost))) return;
+    const item = root.querySelector<HTMLElement>(CURRENT_ITEM);
+    if (item && item !== now) item.focus();
+  });
+  useLayoutEffect(() => {
+    if (request > 0) ref.current?.querySelector<HTMLElement>(CURRENT_ITEM)?.focus();
   }, [ref, request]);
 }
 

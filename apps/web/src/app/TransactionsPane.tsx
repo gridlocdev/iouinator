@@ -1,7 +1,7 @@
 /** The Transactions pane (PRD §4): the form above, the list below, with the filter between. */
 import { useRef } from 'preact/hooks';
 import { formatCents } from '@iouinator/core';
-import { useFocusRequest, useScrollIntoView } from '@iouinator/ui';
+import { useFocusRequest, useRovingFocus, useScrollIntoView } from '@iouinator/ui';
 import type { AppController } from './controller.ts';
 import { TransactionFields, useTransactionDraft } from './TransactionFields.tsx';
 
@@ -65,8 +65,9 @@ function FilterBar({ app }: { readonly app: AppController }) {
 }
 
 /**
- * The list: one row per transaction, newest last. It takes the keyboard as one stop; ↑/↓, Home/End choose a
- * row, Enter edits it and Delete removes it, through the command catalog (PRD §4.3).
+ * The list: one row per transaction, newest last. It takes the keyboard as one stop, the chosen row (or the last
+ * when none is); ↑/↓, Home/End choose a row, Enter edits it and Delete removes it, through the command catalog
+ * (PRD §4.3). The chosen row is the app's state, and the keyboard follows it.
  */
 function TransactionList({ app }: { readonly app: AppController }) {
   const list = useRef<HTMLDivElement>(null);
@@ -75,22 +76,24 @@ function TransactionList({ app }: { readonly app: AppController }) {
   const all = app.ledger.value.transactions.length;
   useScrollIntoView(list, chosen === null ? null : `[data-id="${chosen}"]`);
   const focus = app.focus.value;
-  useFocusRequest(list, focus.target === 'list' ? focus.n : 0);
+  useRovingFocus(list, focus.target === 'list' ? focus.n : 0);
   if (rows.length === 0)
     return <p class="iou-empty">{all === 0 ? 'No transactions yet.' : 'No transactions match.'}</p>;
+  const current = rows.some((t) => t.id === chosen) ? chosen : rows.at(-1)!.id;
   return (
     <div
       ref={list}
       class="iou-transaction-list"
       role="listbox"
-      tabIndex={0}
       aria-label="Transactions"
-      aria-activedescendant={chosen !== null ? `iou-t-${chosen}` : undefined}
-      onFocus={() => {
+      onFocusIn={(e) => {
         app.listFocused.value = true;
-        if (chosen === null || !rows.some((t) => t.id === chosen)) app.chosen.value = rows.at(-1)!.id;
+        const id = (e.target as HTMLElement).dataset.id;
+        if (id !== undefined && id !== chosen) app.chosen.value = id;
       }}
-      onBlur={() => (app.listFocused.value = false)}
+      onFocusOut={(e) => {
+        if (!list.current?.contains(e.relatedTarget as Node | null)) app.listFocused.value = false;
+      }}
       onContextMenu={(e) => {
         // A right-click opens on its row; Shift+F10 or the menu key on the chosen one.
         e.preventDefault();
@@ -112,6 +115,7 @@ function TransactionList({ app }: { readonly app: AppController }) {
             data-id={t.id}
             role="option"
             aria-selected={t.id === chosen}
+            tabIndex={t.id === current ? 0 : -1}
             aria-label={label}
             class="iou-transaction"
             onPointerDown={() => (app.chosen.value = t.id)}

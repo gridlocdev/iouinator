@@ -1,11 +1,11 @@
 /** The page's one keyboard listener: every key goes through the command catalog (PRD §10). */
 import type { CommandCatalog, KeyFocus } from './command.ts';
 
-/** Where keyboard focus is, for deciding which keys are commands. */
+/** Where keyboard focus is, for deciding which keys are commands. A list's own row counts as the list. */
 export function keyFocus(el: Element | null): KeyFocus {
   if (!el || el === el.ownerDocument?.body) return 'list';
   if (el.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return 'text';
-  if (el.closest('button, a, [role=button], [role=menuitem], [role=option]')) return 'control';
+  if (el.closest('button, a, [role=button], [role=menuitem]')) return 'control';
   return 'list';
 }
 

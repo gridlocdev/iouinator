@@ -25,6 +25,9 @@
   --iou-accent: #1f8f4e;
   --iou-accent-soft: color-mix(in srgb, var(--iou-accent) 16%, transparent);
   --iou-accent-text: #ffffff;
+  /* The one focus ring, drawn by the app in both themes; the browser's own outline never shows. */
+  --iou-focus: var(--iou-accent);
+  --iou-focus-ring: 2px solid var(--iou-focus);
   --iou-danger: #d13438;
   --iou-shadow: 0 12px 36px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
   --iou-backdrop: rgba(0, 0, 0, 0.28);
@@ -145,8 +148,11 @@ img,
 svg {
   -webkit-user-drag: none;
 }
+:focus {
+  outline: none;
+}
 :focus-visible {
-  outline: 2px solid var(--iou-accent);
+  outline: var(--iou-focus-ring);
   outline-offset: 1px;
 }
 kbd {
@@ -293,9 +299,6 @@ kbd {
 .iou-backdrop-top {
   align-items: flex-start;
   padding-top: 12vh;
-}
-.iou-dialog:focus {
-  outline: none;
 }
 .iou-dialog {
   width: 440px;

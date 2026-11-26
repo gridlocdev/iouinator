@@ -215,9 +215,6 @@ button.iou-ledger-name:hover {
   border-radius: var(--iou-radius);
   background: var(--iou-raised);
 }
-.iou-transaction-list:focus-visible {
-  outline-offset: 2px;
-}
 .iou-transaction {
   display: grid;
   grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
@@ -227,17 +224,20 @@ button.iou-ledger-name:hover {
   border-bottom: 1px solid var(--iou-line);
   cursor: default;
 }
+.iou-transaction:focus-visible {
+  outline: none;
+}
 .iou-transaction:last-child {
   border-bottom: 0;
 }
 .iou-transaction[aria-selected='true'] {
   background: var(--iou-hover);
 }
-.iou-transaction-list:focus .iou-transaction[aria-selected='true'] {
+.iou-transaction-list:focus-within .iou-transaction[aria-selected='true'] {
   background: var(--iou-accent);
   color: var(--iou-accent-text);
 }
-.iou-transaction-list:focus .iou-transaction[aria-selected='true'] .iou-transaction-for {
+.iou-transaction-list:focus-within .iou-transaction[aria-selected='true'] .iou-transaction-for {
   color: inherit;
 }
 .iou-transaction-who {

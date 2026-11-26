@@ -24,7 +24,7 @@ export function Dialog(props: {
     const root = ref.current;
     const first =
       root?.querySelector<HTMLElement>('[data-autofocus]') ??
-      root?.querySelector<HTMLElement>('input, select, textarea, button');
+      root?.querySelector<HTMLElement>('input, select, textarea, button:not([tabindex="-1"])');
     if (!root?.contains(document.activeElement)) first?.focus();
     return () => {
       if (previous?.isConnected && previous !== document.body) previous.focus();

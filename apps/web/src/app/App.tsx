@@ -1,6 +1,6 @@
 import type { ReadonlySignal } from '@preact/signals';
 import type { CommandCatalog } from '@iouinator/ui';
-import { Icon } from '@iouinator/ui';
+import { Icon, RadioRow } from '@iouinator/ui';
 import { ContextMenu } from './ContextMenu.tsx';
 import type { AppController } from './controller.ts';
 import { DiagramPane } from './DiagramPane.tsx';
@@ -10,6 +10,8 @@ import { inBrowserStorage, type LedgerFolders } from './ledgerFolders.ts';
 import type { Release } from './native.ts';
 import { PeoplePane } from './PeoplePane.tsx';
 import { TransactionsPane } from './TransactionsPane.tsx';
+
+const VIEW_SWITCH = { raw: 'Raw', flat: 'Flattened' } as const;
 
 /** The top bar (PRD §9): the ledger's name, which opens the ledger list, and the Raw / Flattened switch. */
 function TopBar({
@@ -40,20 +42,15 @@ function TopBar({
       ) : (
         <span class="iou-ledger-name">IOUinator</span>
       )}
-      <div class="iou-segmented iou-view-switch" role="radiogroup" aria-label="Diagram view">
-        {(['raw', 'flat'] as const).map((v) => (
-          <button
-            key={v}
-            type="button"
-            role="radio"
-            aria-checked={view === v}
-            title={keys ? `Flatten Debts (${keys})` : undefined}
-            onClick={() => app.setView(v)}
-          >
-            {v === 'raw' ? 'Raw' : 'Flattened'}
-          </button>
-        ))}
-      </div>
+      <RadioRow
+        class="iou-view-switch"
+        label="Diagram view"
+        items={['raw', 'flat'] as const}
+        titles={VIEW_SWITCH}
+        value={view}
+        title={keys ? `Flatten Debts (${keys})` : undefined}
+        onPick={(v) => app.setView(v)}
+      />
     </header>
   );
 }

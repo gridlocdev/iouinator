@@ -3,6 +3,7 @@ import { amountText, personById } from '@iouinator/core';
 import {
   Dialog,
   ListPopup,
+  RadioRow,
   THEMES,
   VIEWS,
   filterEntries,
@@ -207,7 +208,7 @@ function ShortcutsDialog({
 const THEME_TITLES: Readonly<Record<Theme, string>> = { system: 'System', light: 'Light', dark: 'Dark' };
 const VIEW_TITLES: Readonly<Record<View, string>> = { raw: 'Raw', flat: 'Flattened' };
 
-/** A row of radio buttons. */
+/** A labelled row of radio buttons. */
 export function Choice<T extends string>(props: {
   readonly id: string;
   readonly label: string;
@@ -219,19 +220,13 @@ export function Choice<T extends string>(props: {
   return (
     <div class="iou-field">
       <span id={props.id}>{props.label}</span>
-      <div class="iou-segmented" role="radiogroup" aria-labelledby={props.id}>
-        {props.items.map((item) => (
-          <button
-            key={item}
-            type="button"
-            role="radio"
-            aria-checked={props.value === item}
-            onClick={() => props.onPick(item)}
-          >
-            {props.titles[item]}
-          </button>
-        ))}
-      </div>
+      <RadioRow
+        labelledBy={props.id}
+        items={props.items}
+        titles={props.titles}
+        value={props.value}
+        onPick={props.onPick}
+      />
     </div>
   );
 }

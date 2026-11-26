@@ -47,18 +47,21 @@ export {
 export { after, debounce, every, nextFrame, wait } from './schedule.ts';
 export {
   useAsyncMarkup,
+  CURRENT_ITEM,
   useFocusRequest,
   useFocusWhen,
   useKeyCapture,
   useMediaQuery,
   usePopupFocus,
   usePopupPlace,
+  useRovingFocus,
   useScrollIntoView,
 } from './components/domHooks.ts';
 export { Dialog } from './components/Dialog.tsx';
 export { focusables, trapIndex, trapTab } from './components/focusTrap.ts';
 export { Icon } from './components/Icon.tsx';
 export { ListPopup, listStep } from './components/ListPopup.tsx';
+export { RadioRow, radioStep } from './components/RadioRow.tsx';
 export {
   BROWSER_LABEL,
   STORAGE_FOLDER,

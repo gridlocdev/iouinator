@@ -49,5 +49,7 @@ describe('keyFocus', () => {
     expect(keyFocus(fakeElement('button'))).toBe('control');
     expect(keyFocus(fakeElement())).toBe('list');
     expect(keyFocus(null)).toBe('list');
+    // A focused list row takes the list's keys (Enter edits it), not a button's.
+    expect(keyFocus(fakeElement('[role=option]'))).toBe('list');
   });
 });

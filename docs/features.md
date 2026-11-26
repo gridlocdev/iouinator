@@ -34,6 +34,10 @@ Each ledger is one JSON file, `Name.iou.json`, saved a moment after every change
 
 Settings (**⌘,**) sets the appearance (System, Light or Dark) and whether the diagram starts Raw or Flattened. Both are kept for next time.
 
+## Keyboard focus
+
+**Tab** moves through the window, and wherever the keyboard is shows in the app's own colour, in light and dark. The transaction list and each row of choices (Raw or Flattened, the appearance) are one Tab stop each: the arrows move inside them, and the keyboard is always on the chosen row or choice. After a delete, an undo or closing a dialog, the keyboard is back on the row the list has chosen.
+
 ## Desktop and browser
 
 The same app runs in a browser tab and as a desktop app for macOS, Windows and Linux. The desktop app has a native menu bar, a window without a title bar on macOS, and checks for new releases.

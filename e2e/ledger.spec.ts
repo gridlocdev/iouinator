@@ -31,6 +31,29 @@ async function pressKey(page: Page, key: string): Promise<void> {
 }
 
 const row = (page: Page, text: string) => transactionList(page).getByRole('option', { name: text });
+/** The list's one Tab stop: the chosen row, or the last when none is. */
+const currentRow = (page: Page) => transactionList(page).locator('[tabindex="0"]');
+
+/**
+ * How the focused element shows focus: `ring` for the app's own outline in the theme's focus colour,
+ * `chosen` for a list row drawn in the accent, `browser` for the browser's default outline, `none` for nothing.
+ */
+function focusLook(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const el = document.activeElement as HTMLElement;
+    const probe = document.createElement('i');
+    probe.style.color = 'var(--iou-focus)';
+    document.body.append(probe);
+    const focusColour = getComputedStyle(probe).color;
+    probe.remove();
+    const s = getComputedStyle(el);
+    if (s.outlineStyle === 'auto' || (s.outlineStyle !== 'none' && s.outlineColor !== focusColour))
+      return 'browser';
+    if (s.outlineStyle === 'solid' && parseFloat(s.outlineWidth) >= 2) return 'ring';
+    if (el.getAttribute('aria-selected') === 'true' && s.backgroundColor === focusColour) return 'chosen';
+    return 'none';
+  });
+}
 
 /** Sam, Alex and Kim, owing round a loop, and Alex owing Sam a little back. */
 async function loop(page: Page): Promise<void> {
@@ -98,7 +121,7 @@ test.describe('Transactions', () => {
     await expect(row(page, 'Alex owes Sam $1,300.00 for Rent')).toBeVisible();
 
     await addTransaction(page, 'Sam', 'Alex', '3', 'Gum');
-    await transactionList(page).focus();
+    await currentRow(page).focus();
     await page.keyboard.press('ArrowUp');
     await expect(row(page, 'Alex owes Sam $1,300.00 for Rent')).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('Delete');
@@ -324,6 +347,103 @@ test.describe('Commands and shortcuts', () => {
     await expect(shortcuts).toBeHidden();
     await pressKey(page, 'f');
     await expect(page.getByRole('radio', { name: 'Flattened' })).toBeChecked();
+  });
+});
+
+test.describe('Keyboard focus', () => {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`the app draws every focus itself, never the browser's outline (${theme})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: theme });
+      await addPeople(page, 'Sam', 'Alex');
+      await addTransaction(page, 'Sam', 'Alex', '5', 'Taxi');
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+      // Tab through the whole window: every stop shows the app's own focus.
+      const seen = new Set<string>();
+      for (let i = 0; i < 40; i++) {
+        await page.keyboard.press('Tab');
+        const what = await page.evaluate(() => {
+          const el = document.activeElement;
+          return el && el !== document.body
+            ? `${el.tagName}:${el.getAttribute('aria-label') ?? el.textContent}`
+            : '';
+        });
+        if (!what) continue;
+        expect(await focusLook(page), what).toMatch(/^(ring|chosen)$/);
+        seen.add(what);
+      }
+      expect(seen.size, 'Tab reached the controls').toBeGreaterThan(8);
+    });
+  }
+
+  test('↑ ↓ move the chosen row and the keyboard together; Undo, Delete and a dialog keep them together', async ({
+    page,
+  }) => {
+    await addPeople(page, 'Sam', 'Alex');
+    await addTransaction(page, 'Sam', 'Alex', '1', 'One');
+    await addTransaction(page, 'Sam', 'Alex', '2', 'Two');
+    await addTransaction(page, 'Sam', 'Alex', '3', 'Three');
+    const one = row(page, 'for One');
+    const two = row(page, 'for Two');
+    const three = row(page, 'for Three');
+    const chosenAndFocused = async (r: typeof one) => {
+      await expect(r).toBeFocused();
+      await expect(r).toHaveAttribute('aria-selected', 'true');
+      expect(await focusLook(page)).toBe('chosen');
+    };
+
+    // One Tab stop, the last row when none is chosen.
+    await expect(currentRow(page)).toHaveCount(1);
+    await currentRow(page).focus();
+    await chosenAndFocused(three);
+    await page.keyboard.press('ArrowUp');
+    await chosenAndFocused(two);
+    await page.keyboard.press('Home');
+    await chosenAndFocused(one);
+    await page.keyboard.press('End');
+    await chosenAndFocused(three);
+    await one.click();
+    await chosenAndFocused(one);
+
+    // Editing and closing the dialog brings the keyboard back to the same row.
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+    const edit = page.getByRole('dialog', { name: 'Edit Transaction' });
+    await expect(edit).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(edit).toBeHidden();
+    await chosenAndFocused(two);
+
+    // Delete moves both to the next row; so does undoing the add of the focused row.
+    await page.keyboard.press('Delete');
+    await chosenAndFocused(three);
+    await page.keyboard.press('ControlOrMeta+KeyZ');
+    await expect(two).toBeVisible();
+    await chosenAndFocused(three);
+    await page.keyboard.press('ControlOrMeta+KeyZ');
+    await expect(three).toBeHidden();
+    await chosenAndFocused(two);
+
+    // From the right-click menu too.
+    await one.click({ button: 'right' });
+    await page.getByRole('menuitem', { name: 'Delete Transaction' }).click();
+    await chosenAndFocused(two);
+  });
+
+  test('a radio row is one Tab stop and the arrows move the choice and the ring together', async ({
+    page,
+  }) => {
+    const view = page.getByRole('radiogroup', { name: 'Diagram view' });
+    await view.getByRole('radio', { checked: true }).focus();
+    await expect(view.getByRole('radio', { name: 'Raw' })).toBeFocused();
+    await expect(view.locator('[tabindex="0"]')).toHaveCount(1);
+    await page.keyboard.press('ArrowRight');
+    await expect(view.getByRole('radio', { name: 'Flattened' })).toBeFocused();
+    await expect(view.getByRole('radio', { name: 'Flattened' })).toBeChecked();
+    expect(await focusLook(page)).toBe('ring');
+    // A command changes the choice without taking the keyboard from where it is.
+    await pressKey(page, 'f');
+    await expect(view.getByRole('radio', { name: 'Raw' })).toBeChecked();
+    await expect(view.getByRole('radio', { name: 'Raw' })).not.toBeFocused();
   });
 });
 

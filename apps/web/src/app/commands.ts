@@ -269,7 +269,11 @@ export function buildCommands(app: AppController, folders?: LedgerFolders): Comm
       keysOnly: true,
       danger: true,
       enabled: () => onList() && app.transactionTarget() !== null,
-      run: withTransaction((t) => app.deleteTransaction(t)),
+      // From the right-click menu too, the keyboard goes back to the list, on the row chosen next.
+      run: withTransaction((t) => {
+        app.deleteTransaction(t);
+        app.requestFocus('list');
+      }),
     },
     ...(
       [
