@@ -9,8 +9,17 @@ files:
   # The window icon on Linux and Windows (macOS takes the bundle's icon.icns).
   - build/icon.png
 asar: true
-# Turns off running as Node, NODE_OPTIONS and --inspect in the packaged app, before it is signed.
-afterPack: scripts/fuses.mjs
+# Electron's fuses, flipped before signing: no running as Node, no NODE_OPTIONS or --inspect, encrypted cookies,
+# and code loaded only from app.asar, checked against its hash. Pages come from app://, never file://.
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableCookieEncryption: true
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
+  resetAdHocDarwinSignature: true
 # One naming scheme on every system: IOUinator-0.1.0-mac-arm64.dmg, IOUinator-0.1.0-win-x64.exe, …
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 mac:

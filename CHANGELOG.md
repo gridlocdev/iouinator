@@ -8,7 +8,7 @@
 
 ### Improvements
 
-- **Locked-down desktop app.** The packaged app can no longer be started as plain Node or with Node's debugging options, and loads only its own bundled code.
+- **Locked-down desktop app.** The packaged app can no longer be started as plain Node or with Node's debugging options, and loads only its own bundled code, which it checks hasn't been changed.
 
 ## 1.1.0
 
