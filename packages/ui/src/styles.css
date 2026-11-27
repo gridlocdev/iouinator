@@ -22,7 +22,7 @@
   --iou-text: #1d1d1f;
   --iou-text-2: #5f6068;
   --iou-text-3: #8e8f97;
-  --iou-accent: #1f8f4e;
+  --iou-accent: #1b8648;
   --iou-accent-soft: color-mix(in srgb, var(--iou-accent) 16%, transparent);
   --iou-accent-text: #ffffff;
   /* The one focus ring, drawn by the app in both themes; the browser's own outline never shows. */
@@ -60,7 +60,7 @@
     --iou-text-3: #7c7c85;
     --iou-accent: #3cc27a;
     --iou-accent-soft: color-mix(in srgb, var(--iou-accent) 24%, transparent);
-    --iou-accent-text: #ffffff;
+    --iou-accent-text: #0b1f14;
     --iou-danger: #ff6b6b;
     --iou-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
     --iou-backdrop: rgba(0, 0, 0, 0.45);
@@ -89,7 +89,7 @@
   --iou-text-3: #7c7c85;
   --iou-accent: #3cc27a;
   --iou-accent-soft: color-mix(in srgb, var(--iou-accent) 24%, transparent);
-  --iou-accent-text: #ffffff;
+  --iou-accent-text: #0b1f14;
   --iou-danger: #ff6b6b;
   --iou-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
   --iou-backdrop: rgba(0, 0, 0, 0.45);

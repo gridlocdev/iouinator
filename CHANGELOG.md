@@ -13,6 +13,7 @@
 
 ### Bugs fixed
 
+- **Readable buttons and chosen rows.** Text on the green accent was hard to read, worst in the dark theme. Both themes now meet the 4.5:1 contrast for text.
 - **The right-click menu takes the keyboard.** Opened with the menu key or Shift+F10, it now focuses its first item, so the arrows and Esc work in it.
 
 ## 1.1.0
