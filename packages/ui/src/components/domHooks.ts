@@ -16,11 +16,12 @@ export function useFocusWhen(ref: RefObject<HTMLElement | null>, when: boolean):
 /**
  * Keeps the keyboard in a popup menu: focuses its first enabled button when it opens, calls `onClose` on a
  * pointer press outside it or when the window loses focus, and gives focus back to where it was on closing.
+ * `shown` is false while the popup is still hidden for placing: a hidden element refuses focus, so the first
+ * button is focused once it shows.
  */
-export function usePopupFocus(ref: RefObject<HTMLElement | null>, onClose: () => void): void {
+export function usePopupFocus(ref: RefObject<HTMLElement | null>, onClose: () => void, shown = true): void {
   useLayoutEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    ref.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
     const away = (e: PointerEvent) => {
       if (!ref.current?.contains(e.target as Node)) onClose();
     };
@@ -34,6 +35,9 @@ export function usePopupFocus(ref: RefObject<HTMLElement | null>, onClose: () =>
         previous.focus();
     };
   }, [ref, onClose]);
+  useLayoutEffect(() => {
+    if (shown) ref.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
+  }, [ref, shown]);
 }
 
 /** Focuses the element each time `request` changes to a new number above 0: a command asked for it. */

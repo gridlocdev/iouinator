@@ -45,7 +45,7 @@ function OpenMenu({
   const ref = useRef<HTMLDivElement>(null);
   const close = useCallback(() => app.closeMenu(), [app]);
   const at = usePopupPlace(ref, menu);
-  usePopupFocus(ref, close);
+  usePopupFocus(ref, close, at !== null);
   return (
     <div
       ref={ref}

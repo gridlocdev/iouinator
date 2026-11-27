@@ -11,6 +11,10 @@
 - **Locked-down desktop app.** The packaged app can no longer be started as plain Node or with Node's debugging options, and loads only its own bundled code, which it checks hasn't been changed.
 - **Focus you can always see.** Wherever the keyboard is shows in IOUinator's own colour, in light and dark. The transaction list and the Raw/Flattened switch are one Tab stop each, moved with the arrows, and after a delete, an undo or closing a dialog the keyboard is back on the chosen row.
 
+### Bugs fixed
+
+- **The right-click menu takes the keyboard.** Opened with the menu key or Shift+F10, it now focuses its first item, so the arrows and Esc work in it.
+
 ## 1.1.0
 
 ### What's new

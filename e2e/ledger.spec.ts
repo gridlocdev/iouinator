@@ -429,6 +429,27 @@ test.describe('Keyboard focus', () => {
     await chosenAndFocused(two);
   });
 
+  test('with reduced motion, a menu opened from the keyboard takes it at once, and Esc closes it', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await addPeople(page, 'Sam', 'Alex');
+    await addTransaction(page, 'Sam', 'Alex', '5', 'Taxi');
+    const taxi = row(page, 'for Taxi');
+    await currentRow(page).focus();
+    await page.keyboard.press('ContextMenu');
+    const menu = page.getByRole('menu');
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole('menuitem').first(), 'the menu has the keyboard').toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    await expect(taxi).toBeFocused();
+    await expect(taxi, 'Esc closed the menu, and left the row chosen').toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
   test('a radio row is one Tab stop and the arrows move the choice and the ring together', async ({
     page,
   }) => {
