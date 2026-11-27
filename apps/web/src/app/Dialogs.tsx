@@ -271,15 +271,16 @@ function EditTransactionDialog({ app }: { readonly app: AppController }) {
   const t = app.ledger.value.transactions.find((x) => x.id === app.editing.value);
   const draft = useTransactionDraft(
     app,
+    'iou-edit',
     t ? { from: t.from, to: t.to, amount: amountText(t.cents), description: t.description } : undefined,
   );
   if (!t) return null;
   const submit = () => {
     const fields = draft.fields();
-    if ('error' in fields) return draft.setError(fields.error);
+    if ('error' in fields) return draft.fail(fields.error, fields.field);
     const error = app.updateTransaction(t.id, fields);
     if (error === null) app.close();
-    else draft.setError(error);
+    else draft.fail(error);
   };
   return (
     <Dialog

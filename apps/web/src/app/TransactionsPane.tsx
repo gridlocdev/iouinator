@@ -24,7 +24,7 @@ export function TransactionsPane({ app }: { readonly app: AppController }) {
 
 /** Adds a transaction; From and To stay for the next one, and focus goes back to Amount (PRD §4.3). */
 function TransactionForm({ app }: { readonly app: AppController }) {
-  const draft = useTransactionDraft(app);
+  const draft = useTransactionDraft(app, 'iou-new');
   const amount = useRef<HTMLInputElement>(null);
   const focus = app.focus.value;
   useFocusRequest(amount, focus.target === 'amount' ? focus.n : 0);
@@ -32,11 +32,17 @@ function TransactionForm({ app }: { readonly app: AppController }) {
     <form
       class="iou-transaction-form"
       aria-label="New transaction"
+      // An error is about this try: moving on to something else (a row, a dialog) drops it.
+      onFocusOut={(e) => {
+        const to = e.relatedTarget as Node | null;
+        if (to && !e.currentTarget.contains(to)) draft.clear();
+      }}
       onSubmit={(e) => {
         e.preventDefault();
         const fields = draft.fields();
-        const error = 'error' in fields ? fields.error : app.addTransaction(fields);
-        if (error !== null) return draft.setError(error);
+        if ('error' in fields) return draft.fail(fields.error, fields.field);
+        const error = app.addTransaction(fields);
+        if (error !== null) return draft.fail(error);
         draft.set({ amount: '', description: '' });
         amount.current?.focus();
       }}

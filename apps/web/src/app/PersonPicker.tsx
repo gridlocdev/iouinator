@@ -32,6 +32,7 @@ export function PersonPicker({
   people,
   value,
   describedBy,
+  invalid = false,
   onPick,
 }: {
   readonly id: string;
@@ -39,6 +40,7 @@ export function PersonPicker({
   readonly people: readonly Person[];
   readonly value: string;
   readonly describedBy: string | undefined;
+  readonly invalid?: boolean;
   readonly onPick: (id: string) => void;
 }) {
   const button = useRef<HTMLButtonElement>(null);
@@ -99,6 +101,7 @@ export function PersonPicker({
         aria-controls={open ? `${id}-list` : undefined}
         aria-activedescendant={open ? optionId(index) : undefined}
         aria-describedby={describedBy}
+        aria-invalid={invalid}
         onClick={() => (open ? close() : show())}
         onKeyDown={onKeyDown}
         // Space opens on key down; its key up would click the button and close the list again.

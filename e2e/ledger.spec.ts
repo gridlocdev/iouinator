@@ -105,9 +105,21 @@ test.describe('Transactions', () => {
     await form.getByLabel('Amount').fill('5');
     await form.getByLabel('Amount').press('Enter');
     await expect(form.getByRole('alert')).toHaveText('Say what the transaction is for.');
+    // The error marks the field it is about and takes the keyboard there.
+    await expect(form.getByLabel('For')).toBeFocused();
+    await expect(form.getByLabel('For')).toHaveAttribute('aria-invalid', 'true');
+    await expect(form.getByLabel('Amount')).toHaveAttribute('aria-invalid', 'false');
     await addTransaction(page, 'Sam', 'Alex', '$1,200.5', 'Rent');
     await expect(row(page, 'Sam owes Alex $1,200.50 for Rent')).toBeVisible();
     await expect(form.getByLabel('Amount'), 'focus goes back to Amount').toBeFocused();
+    // An error left behind goes when you move on to something else.
+    await form.getByLabel('Amount').fill('x');
+    await form.getByLabel('Amount').press('Enter');
+    await expect(form.getByRole('alert')).toBeVisible();
+    await expect(form.getByLabel('Amount')).toHaveAttribute('aria-invalid', 'true');
+    await currentRow(page).focus();
+    await expect(form.getByRole('alert')).toBeHidden();
+    await form.getByLabel('Amount').fill('');
 
     await row(page, 'Sam owes Alex $1,200.50 for Rent').dblclick();
     const edit = page.getByRole('dialog', { name: 'Edit Transaction' });

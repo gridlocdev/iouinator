@@ -13,6 +13,7 @@
 
 ### Bugs fixed
 
+- **Errors point at the right field.** A missing description or person now marks that field and moves the keyboard there, not to Amount. An error also goes away when you move on from the form, and the hints in Amount and For read as examples.
 - **Readable buttons and chosen rows.** Text on the green accent was hard to read, worst in the dark theme. Both themes now meet the 4.5:1 contrast for text.
 - **The right-click menu takes the keyboard.** Opened with the menu key or Shift+F10, it now focuses its first item, so the arrows and Esc work in it.
 

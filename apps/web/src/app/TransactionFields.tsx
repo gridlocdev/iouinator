@@ -1,6 +1,12 @@
 /** The From, To, Amount and For fields, shared by the transaction form and Edit Transaction… (PRD §4.3). */
 import { useState } from 'preact/hooks';
-import { MAX_DESCRIPTION, parseAmount, type Ledger, type TransactionFields as Fields } from '@iouinator/core';
+import {
+  MAX_DESCRIPTION,
+  checkDescription,
+  parseAmount,
+  type Ledger,
+  type TransactionFields as Fields,
+} from '@iouinator/core';
 import type { AppController } from './controller.ts';
 import { PersonPicker } from './PersonPicker.tsx';
 
@@ -11,13 +17,24 @@ export interface DraftValues {
   readonly description: string;
 }
 
+/** The field an error is about: it is marked invalid and gets the keyboard. */
+export type DraftField = 'from' | 'amount' | 'for';
+
+export interface DraftError {
+  readonly message: string;
+  readonly field: DraftField;
+}
+
 export interface TransactionDraft {
   readonly values: DraftValues;
-  readonly error: string | null;
+  readonly error: DraftError | null;
   set(change: Partial<DraftValues>): void;
-  setError(error: string | null): void;
-  /** The fields as the ledger takes them, or the amount's error. */
-  fields(): Fields | { readonly error: string };
+  /** Shows the error on its field and moves the keyboard there. */
+  fail(message: string, field?: DraftField): void;
+  /** Drops the error, as when you move on from the form. */
+  clear(): void;
+  /** The fields as the ledger takes them, or the first error and its field. */
+  fields(): Fields | { readonly error: string; readonly field: DraftField };
 }
 
 const EMPTY: DraftValues = { from: '', to: '', amount: '', description: '' };
@@ -34,9 +51,13 @@ export function shownPair(ledger: Ledger, values: DraftValues): { from: string; 
   return { from, to };
 }
 
-export function useTransactionDraft(app: AppController, initial: DraftValues = EMPTY): TransactionDraft {
+export function useTransactionDraft(
+  app: AppController,
+  idPrefix: string,
+  initial: DraftValues = EMPTY,
+): TransactionDraft {
   const [values, setValues] = useState(initial);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DraftError | null>(null);
   return {
     values,
     error,
@@ -44,12 +65,20 @@ export function useTransactionDraft(app: AppController, initial: DraftValues = E
       setValues((v) => ({ ...v, ...change }));
       setError(null);
     },
-    setError,
+    fail(message, field = 'amount') {
+      setError({ message, field });
+      document.getElementById(`${idPrefix}-${field}`)?.focus();
+    },
+    clear() {
+      setError(null);
+    },
     fields() {
       const { from, to } = shownPair(app.ledger.value, values);
-      if (!from || !to) return { error: 'Choose who owes and whom.' };
+      if (!from || !to) return { error: 'Choose who owes and whom.', field: 'from' };
       const amount = parseAmount(values.amount);
-      if ('error' in amount) return amount;
+      if ('error' in amount) return { error: amount.error, field: 'amount' };
+      const description = checkDescription(values.description);
+      if ('error' in description) return { error: description.error, field: 'for' };
       return { from, to, cents: amount.cents, description: values.description };
     },
   };
@@ -81,6 +110,7 @@ export function TransactionFields({
         people={people}
         value={from}
         describedBy={described}
+        invalid={draft.error?.field === 'from'}
         // Picking the person in To swaps the two, so From and To never match.
         onPick={(next) => draft.set(next === to ? { from: next, to: from } : { from: next })}
       />
@@ -99,13 +129,14 @@ export function TransactionFields({
         <span>Amount</span>
         <input
           ref={amountRef}
+          id={`${idPrefix}-amount`}
           type="text"
           inputMode="decimal"
           autoComplete="off"
-          placeholder="$0.00"
+          placeholder="e.g. 12.50"
           value={draft.values.amount}
           data-autofocus={autofocus === 'amount' ? true : undefined}
-          aria-invalid={draft.error !== null}
+          aria-invalid={draft.error?.field === 'amount'}
           aria-describedby={described}
           onInput={(e) => draft.set({ amount: e.currentTarget.value })}
           onFocus={(e) => e.currentTarget.select()}
@@ -114,18 +145,20 @@ export function TransactionFields({
       <label class="iou-field iou-field-for">
         <span>For</span>
         <input
+          id={`${idPrefix}-for`}
           type="text"
           autoComplete="off"
-          placeholder="Pizza"
+          placeholder="e.g. Pizza"
           maxLength={MAX_DESCRIPTION + 20}
           value={draft.values.description}
+          aria-invalid={draft.error?.field === 'for'}
           aria-describedby={described}
           onInput={(e) => draft.set({ description: e.currentTarget.value })}
         />
       </label>
       {draft.error && (
         <p id={errorId} class="iou-field-error" role="alert">
-          {draft.error}
+          {draft.error.message}
         </p>
       )}
     </div>
