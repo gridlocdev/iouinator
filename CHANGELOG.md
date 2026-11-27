@@ -8,6 +8,9 @@
 
 ### Improvements
 
+- **Clearer status bar.** On the desktop it says which folder holds your ledgers. Settings is a labelled button, and a notice's action (Undo, Download) is easier to see.
+- **Less to read when you start.** With fewer than two people the transactions pane shows one line, not two, and with two or more a hint says that clicking a person shows only their transactions.
+- **Deleting your only ledger says what happened.** The notice says a new, empty ledger was started, so it no longer looks as if the data was wiped.
 - **Locked-down desktop app.** The packaged app can no longer be started as plain Node or with Node's debugging options, and loads only its own bundled code, which it checks hasn't been changed.
 - **Focus you can always see.** Wherever the keyboard is shows in IOUinator's own colour, in light and dark. The transaction list and the Raw/Flattened switch are one Tab stop each, moved with the arrows, and after a delete, an undo or closing a dialog the keyboard is back on the chosen row.
 

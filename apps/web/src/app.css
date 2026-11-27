@@ -477,6 +477,37 @@ button.iou-ledger-name:hover {
 .iou-notice-error {
   color: var(--iou-danger);
 }
+.iou-notice .iou-link-button {
+  font-size: 12px;
+  font-weight: 600;
+}
+.iou-status-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--iou-radius);
+  background: none;
+  color: var(--iou-text-2);
+  font: inherit;
+  cursor: default;
+}
+.iou-status-button:hover {
+  background: var(--iou-hover);
+  color: var(--iou-text);
+}
+.iou-status-button .iou-icon {
+  width: 13px;
+  height: 13px;
+}
+.iou-hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--iou-text-3);
+}
 
 /* Ledger folder dialogs */
 .iou-field-wide {

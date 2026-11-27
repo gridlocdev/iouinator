@@ -83,6 +83,8 @@ function TransactionList({ app }: { readonly app: AppController }) {
   useScrollIntoView(list, chosen === null ? null : `[data-id="${chosen}"]`);
   const focus = app.focus.value;
   useRovingFocus(list, focus.target === 'list' ? focus.n : 0);
+  // Under "Add at least two people…", an empty list has nothing more to say.
+  if (all === 0 && app.ledger.value.people.length < 2) return null;
   if (rows.length === 0)
     return <p class="iou-empty">{all === 0 ? 'No transactions yet.' : 'No transactions match.'}</p>;
   const current = rows.some((t) => t.id === chosen) ? chosen : rows.at(-1)!.id;

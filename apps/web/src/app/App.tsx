@@ -99,6 +99,14 @@ function StatusBar({
         {!notice && failed === null && !release && inBrowserStorage(current) && (
           <span class="iou-storage-note">Stored in this browser</span>
         )}
+        {!notice &&
+          failed === null &&
+          !release &&
+          current !== null &&
+          !inBrowserStorage(current) &&
+          current.folder.readOnly === undefined && (
+            <span class="iou-storage-note">Ledgers in {current.folder.label}</span>
+          )}
         {!notice && failed === null && !release && current?.folder.readOnly !== undefined && (
           <span class="iou-storage-note" title={current.folder.readOnly}>
             Read-only: {current.folder.label}
@@ -124,14 +132,9 @@ function StatusBar({
           </>
         )}
       </div>
-      <button
-        type="button"
-        class="iou-icon-button iou-small"
-        aria-label="Settings"
-        title="Settings"
-        onClick={() => app.open('settings')}
-      >
+      <button type="button" class="iou-status-button" onClick={() => app.open('settings')}>
         <Icon name="settings" />
+        Settings
       </button>
       <div class="iou-live" role="status" aria-live="polite" aria-atomic="true">
         {app.announcement.value}

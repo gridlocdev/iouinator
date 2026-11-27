@@ -102,6 +102,9 @@ export function PeoplePane({ app }: { readonly app: AppController }) {
           })}
         </ul>
       )}
+      {people.length >= 2 && !filter && (
+        <p class="iou-hint">Click a person to see only their transactions.</p>
+      )}
     </section>
   );
 }

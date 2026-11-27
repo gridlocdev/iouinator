@@ -72,7 +72,13 @@ test.describe('People', () => {
   test('adds people with their balances, refuses a repeated name, renames and removes with Undo', async ({
     page,
   }) => {
-    await addPeople(page, 'Sam', 'Alex');
+    // With fewer than two people the transactions pane says one thing, and the filter hint waits for two.
+    await expect(page.getByText('Add at least two people to record a transaction.')).toBeVisible();
+    await expect(page.getByText('No transactions yet.')).toBeHidden();
+    await addPeople(page, 'Sam');
+    await expect(page.getByText('Click a person to see only their transactions.')).toBeHidden();
+    await addPeople(page, 'Alex');
+    await expect(page.getByText('Click a person to see only their transactions.')).toBeVisible();
     await expect(person(page, 'Sam')).toContainText('settled');
     await personField(page).fill('sam');
     await personField(page).press('Enter');

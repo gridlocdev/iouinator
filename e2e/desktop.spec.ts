@@ -56,6 +56,8 @@ test.describe('Desktop and browser', () => {
         const window = await app.firstWindow();
         const errors = watchErrors(window);
         await firstStart(window);
+        // The status bar names the folder the ledgers are in.
+        await expect(window.locator('.iou-status')).toContainText('Ledgers in IOUinator');
         if (process.platform === 'darwin') {
           // No title bar: the page's top row drags the window, and the buttons in it still click.
           const chrome = await window.evaluate(() => {
