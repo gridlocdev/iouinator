@@ -349,8 +349,11 @@ export class OpenLedger {
     await this.flush();
     const trashed = await this.library.trash(name);
     this.#keep.dropSnapshot(this.#key, name);
-    await this.#openAnother();
-    this.#app.say(`Moved ${name} to the trash.`, {
+    const left = await this.#refreshNames();
+    await this.#openFirst(left);
+    // With none left, a new empty ledger opens, maybe with the same name: say so, or it looks like a wipe.
+    const fresh = left.length === 0 ? ' and started a new, empty ledger' : '';
+    this.#app.say(`Moved ${name} to the trash${fresh}.`, {
       action: { label: 'Undo', run: () => void this.restoreTrashed(trashed) },
     });
   }

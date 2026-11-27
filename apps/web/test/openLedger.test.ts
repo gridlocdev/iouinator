@@ -258,10 +258,11 @@ describe('the folder’s ledgers (PRD §8.2)', () => {
     expect(summary(app.ledger.value)).toEqual(['Sam']);
   });
 
-  it('deleting the last ledger leaves a new one', async () => {
-    const { current, folder } = await startOpenLedger();
+  it('deleting the last ledger leaves a new one, and says so', async () => {
+    const { app, current, folder } = await startOpenLedger();
     await current.trash();
     expect(current.name.value).toBe('Ledger');
+    expect(app.notice.value?.text).toBe('Moved Ledger to the trash and started a new, empty ledger.');
     expect([...disk(folder).keys()].sort()).toEqual(['.iouinator/trash/Ledger.iou.json', 'Ledger.iou.json']);
   });
 });
